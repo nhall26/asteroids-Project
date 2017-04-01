@@ -12,9 +12,13 @@
 Spaceship player1;
 ArrayList<bullet> bullets;
 ArrayList<asteroid> asteroids;
+ArrayList<alien> enemy;
+ArrayList<Alaser> laser;
 boolean tryAgain = false;
 int tryAgainCount = 4;
 int asteroidCount = 5;
+int alienCount = 1;
+int laserCount = 1;
 
 void setup() {
   size(800, 800);
@@ -22,8 +26,17 @@ void setup() {
   bullets = new ArrayList<bullet>();
   player1 = new Spaceship();
   asteroids = new ArrayList<asteroid>();
+  enemy = new ArrayList<alien>();
+  laser = new ArrayList<Alaser>();
+
   for (int i = 0; i < asteroidCount; i++) {
     asteroids.add(new asteroid());
+  }
+  for(int i = 0; i < alienCount; i++) {  
+  enemy.add(new alien());
+  }
+  for (int i = 0; i < laserCount; i++) {
+    laser.add(new Alaser());
   }
 }
 
@@ -38,8 +51,13 @@ void draw() {
     header();
     player1.updatePos();  // Update position
     player1.edgeDetection();  // check to see if the ship has exceeded the edges of the frame
-    player1.collisionDetection(asteroids);
-    player1.render();    // render the ship  
+    player1.render();    // render the ship
+    if (player1.collisionDetection(asteroids)){
+        player1.death();
+        delay(50);
+        player1.reset();
+    }
+    
     
     //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
     
@@ -62,7 +80,6 @@ void draw() {
     for(int i = 0; i < bullets.size(); i++) {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
-      bullets.get(i).collisionDetection(asteroids);
       bullets.get(i).render(); 
       if(bullets.get(i).collisionDetection(asteroids)){
         bullets.remove(i);
@@ -73,6 +90,16 @@ void draw() {
       asteroids.get(i).updatePos();
       asteroids.get(i).edgeDetection();
       asteroids.get(i).render();
+    }
+    for (int i = 0; i < enemy.size(); i++) {
+      enemy.get(i).updatePos();
+      enemy.get(i).edgeDetection();
+      enemy.get(i).render();
+    }
+    for (int i = 0; i < laser.size(); i++) {
+      laser.get(i).updatePos();
+      laser.get(i).edgeDetection();
+      laser.get(i).render();
     }
   } else if (tryAgain) {
     background(0);
@@ -364,6 +391,108 @@ class asteroid {
     rotate(heading);  //rotate the ship according to its current heading
     fill(255);
     ellipse(0,0, radius*2,radius*2);
+    popMatrix();
+  }
+}
+
+class alien {
+  PVector position, velocity;
+  float heading, angle;
+  int size = 30;
+  Float dirch = random(-180, 180);
+
+
+  alien() {
+    heading = random(-180, 180);
+    position = new PVector (random(0, 800), random(0, 800));
+    angle = heading;
+    velocity = new PVector (cos(angle), sin(angle));
+    velocity.mult(3);
+  }
+
+  void updatePos() {
+    position.add(velocity);
+  }   
+  void newPosition() {
+    translate(position.x, position.y);
+  }
+
+  void edgeDetection() {  //detects if the ship excceeds the frame edges.
+    float buffer = size*2;    //set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // if the x position is too far right
+      position.x = -buffer;    // set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // if the x position is too far left
+      position.x = width;  // set the x position to be the width of the canvas
+    }
+    if (position.y > height + buffer) {  // if the y position is too low
+      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y-125 < -buffer) {    // if y position is too high
+      position.y = height;    // set the y position to be the bottom of the frame
+    }
+  }
+
+  void render() {
+    pushMatrix();
+    translate(position.x, position.y+size);
+    fill(0);
+    stroke(255, 255, 255);
+    beginShape();
+    vertex(size/2, size*1/5);
+    vertex(size*3/5, size*2/5);
+    vertex(size*3/4, size*3/5);
+    vertex(size, size*3/4);
+    vertex(size*3/4, size*9/10);
+    vertex(size/2, size);
+    vertex(size*1/4, size*9/10);
+    vertex(0, size *3/4);
+    vertex(size*1/4, size*3/5);
+    vertex(size*2/5, size*2/5);
+    endShape(CLOSE);
+    beginShape();
+    vertex(size/2, size*2/5);
+    vertex(size*3/5, size*3/5);
+    vertex(size*2/5, size*3/5);
+    endShape(CLOSE);
+    line(0, size*3/4, size, size*3/4);
+    ellipse(size/2, size*8/15, 2, 2);
+    popMatrix();
+  }
+}
+
+class Alaser {
+  PVector position, velocity;
+  float heading, angle;
+  float centreX;
+  float centrey;
+
+  Alaser() {
+    position = new PVector ();
+    velocity = new PVector (cos(angle), sin(angle));
+    velocity.mult(5);
+  }
+
+  void updatePos() {
+    position.add(velocity);
+  }
+  void edgeDetection() {  //detects if the ship excceeds the frame edges.
+    float buffer = 10;    //set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // if the x position is too far right
+      position.x = -buffer;    // set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // if the x position is too far left
+      position.x = width;  // set the x position to be the width of the canvas
+    }
+    if (position.y > height + buffer) {  // if the y position is too low
+      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y - 110 < -buffer) {    // if y position is too high
+      position.y = height;    // set the y position to be the bottom of the frame
+    }
+  }
+  void render() {
+    pushMatrix();
+    translate(position.x, position.y);
+    fill(0);
+    stroke(255, 255, 255);
+    ellipse(0, 0, 3, 3);
     popMatrix();
   }
 }
