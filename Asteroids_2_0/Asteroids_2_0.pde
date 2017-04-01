@@ -331,6 +331,7 @@ class asteroid {
   
     void collisionDetection(){
       if (dist(position.x, position.y,player1.position.x,player1.position.y) < radius){
+        asteroid.remove(this);
         player1.death();
         delay(50);
         player1.reset();
