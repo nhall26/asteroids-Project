@@ -38,6 +38,7 @@ void draw() {
     header();
     player1.updatePos();  // Update position
     player1.edgeDetection();  // check to see if the ship has exceeded the edges of the frame
+    player1.collisionDetection(asteroids);
     player1.render();    // render the ship  
     
     //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
@@ -53,7 +54,7 @@ void draw() {
         player1.thrust();
       } else if (key == CODED && keyCode == DOWN) {
         player1.death();
-        delay(50);
+        delay(50); //<>//
         player1.reset();
       }
     }
@@ -61,12 +62,16 @@ void draw() {
     for(int i = 0; i < bullets.size(); i++) {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
-      bullets.get(i).render();
+      bullets.get(i).collisionDetection(asteroids);
+      bullets.get(i).render(); 
+      if(bullets.get(i).collisionDetection(asteroids)){
+        bullets.remove(i);
+        i--;
+    }
     }
     for(int i = 0; i < asteroids.size(); i++) {
       asteroids.get(i).updatePos();
       asteroids.get(i).edgeDetection();
-      asteroids.get(i).collisionDetection()
       asteroids.get(i).render();
     }
   } else if (tryAgain) {
@@ -77,7 +82,7 @@ void draw() {
       tryAgainCount--;
     }
     else { //if(tryAgainCount < 0) {
-      player1.lives = 3;
+      player1.lives = 3; //<>//
       tryAgainCount = 3;
       tryAgain = false;
     }
@@ -203,11 +208,16 @@ class Spaceship {
     }
   }
   
-    
-  }
-  
-  void collisionDetection(){
-  }
+   boolean collisionDetection(ArrayList<asteroid> asteroids){
+   for(asteroid a : asteroids){
+    PVector dist = PVector.sub(a.position, position);
+    if(dist.mag() < a.radius){
+     a.breakUp();
+     return true; 
+    }
+   }
+   return false;
+ }
 
   void render() {  // render the ship
     pushMatrix();  //saves current coordinate system to the stack
@@ -286,6 +296,21 @@ class bullet {
     }
   }
   
+   boolean collisionDetection(ArrayList<asteroid> asteroids){
+   for(asteroid a : asteroids){
+    PVector dist = PVector.sub(a.position, position);
+    if(dist.mag() < a.radius){
+     a.breakUp();
+     return true; 
+    }
+   }
+   return false;
+ }
+  
+  void removeBullet() {
+    bullets.remove(this);
+  }
+  
   
   void render() {
     pushMatrix();  //saves current coordinate system to the stack
@@ -300,7 +325,6 @@ class bullet {
 class asteroid {
   PVector position, velocity, acceleration;
   float heading, angle, radius;
-  radius = 15
   
   asteroid() {
     heading = random(-180, 180);
@@ -308,6 +332,7 @@ class asteroid {
     position = new PVector (random(0,800), random(0,800));
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(1.75);
+    radius = 15;
   }
   
   void updatePos() {         //update the motion of the object
@@ -329,21 +354,16 @@ class asteroid {
     }
   }
   
-    void collisionDetection(){
-      if (dist(position.x, position.y,player1.position.x,player1.position.y) < radius){
-        asteroid.remove(this);
-        player1.death();
-        delay(50);
-        player1.reset();
-      }
-    }
+  void breakUp(){
+    asteroids.remove(this);
+  }
   
   void render() {
     pushMatrix();  //saves current coordinate system to the stack
     translate(position.x, position.y);  //moves the coordinate system origin to the given points
     rotate(heading);  //rotate the ship according to its current heading
     fill(255);
-    ellipse(0,0, 30,30);
+    ellipse(0,0, radius*2,radius*2);
     popMatrix();
   }
 }
