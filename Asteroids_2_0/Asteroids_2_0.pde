@@ -66,6 +66,7 @@ void draw() {
     for(int i = 0; i < asteroids.size(); i++) {
       asteroids.get(i).updatePos();
       asteroids.get(i).edgeDetection();
+      asteroids.get(i).collisionDetection()
       asteroids.get(i).render();
     }
   } else if (tryAgain) {
@@ -202,15 +203,6 @@ class Spaceship {
     }
   }
   
-    void collisionDetection(){
-    float edgeBuffer = 60;
-    if (position.x + 10 == player1.position.x + 5 && position.y + 10 > player1.position.y + 5 ){
-      if (position.x - 10 == player1.position.x - 5 && position.y - 10 > player1.position.y - 5 ){
-        player1.death();
-        delay(50);
-        player1.reset();
-      }
-    }
     
   }
   
@@ -308,14 +300,14 @@ class bullet {
 class asteroid {
   PVector position, velocity, acceleration;
   float heading, angle, radius;
+  radius = 15
   
-  asteroid(j) {
+  asteroid() {
     heading = random(-180, 180);
     angle = heading; //- PI/2; // offset angle because ship is pointing vertical
     position = new PVector (random(0,800), random(0,800));
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(1.75);
-    radius = j;
   }
   
   void updatePos() {         //update the motion of the object
@@ -336,6 +328,14 @@ class asteroid {
       position.y = height;    // set the y position to be the bottom of the frame
     }
   }
+  
+    void collisionDetection(){
+      if (dist(position.x, position.y,player1.position.x,player1.position.y) < radius){
+        player1.death();
+        delay(50);
+        player1.reset();
+      }
+    }
   
   void render() {
     pushMatrix();  //saves current coordinate system to the stack
