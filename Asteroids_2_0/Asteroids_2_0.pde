@@ -33,7 +33,7 @@ void setup() {
   time = millis();
 
   for (int i = 0; i < asteroidCount; i++) {
-    asteroids.add(new asteroid(40, 0, 800));
+    asteroids.add(new asteroid(30, 0, 800));
   }
 }
 
@@ -432,7 +432,7 @@ class asteroid {
   }
 
   void breakUp() {
-    if (this.radius > 30){
+    if (this.radius > 15){
       float b = this.radius / 2;
       asteroidCount++;
       asteroidCount++;
