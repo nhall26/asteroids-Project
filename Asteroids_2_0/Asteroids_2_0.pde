@@ -78,9 +78,17 @@ void draw() {
     header();
     player1.updatePos();  // Update position
     player1.edgeDetection();  // check to see if the ship has exceeded the edges of the frame
-    player1.collisionDetection(asteroids);
-    player1.collisionDetection2(enemy);
     player1.render();    // render the ship  
+    if (player1.collisionDetection(asteroids)) {
+        player1.death();
+        delay(50);
+        player1.reset();
+      } else if (player1.collisionDetection2(enemy)) {
+        player1.death();
+        delay(50);
+        player1.reset();
+        enemyexists = false;
+      }
 
     //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
 
