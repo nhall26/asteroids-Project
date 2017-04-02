@@ -535,6 +535,7 @@ class Alaser {
 
   void updatePos() {
     position.add(heading);
+    counterLaser++;
   }
   void edgeDetection() {  //detects if the ship excceeds the frame edges.
     float buffer = 10;    //set the buffer to be the size of the shape * 2
