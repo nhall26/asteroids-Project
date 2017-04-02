@@ -12,7 +12,7 @@
 Spaceship player1;
 ArrayList<bullet> bullets;
 ArrayList<asteroid> asteroids;
-ArrayList<alien> enemy;
+alien enemy;
 ArrayList<Alaser> laser;
 boolean tryAgain = false;
 int tryAgainCount = 4;
@@ -26,14 +26,11 @@ void setup() {
   bullets = new ArrayList<bullet>();
   player1 = new Spaceship();
   asteroids = new ArrayList<asteroid>();
-  enemy = new ArrayList<alien>();
+  enemy = new alien();
   laser = new ArrayList<Alaser>();
 
   for (int i = 0; i < asteroidCount; i++) {
     asteroids.add(new asteroid());
-  }
-  for(int i = 0; i < alienCount; i++) {  
-  enemy.add(new alien());
   }
   for (int i = 0; i < laserCount; i++) {
     laser.add(new Alaser());
@@ -84,6 +81,10 @@ void draw() {
       if(bullets.get(i).collisionDetection(asteroids)){
         bullets.remove(i);
         i--;
+    } else if (bullets.get(i).collisionDetectionAlien(enemy) && enemy != null){
+        bullets.remove(i);
+        enemy = null;
+        i--;
     }
     }
     for(int i = 0; i < asteroids.size(); i++) {
@@ -91,11 +92,13 @@ void draw() {
       asteroids.get(i).edgeDetection();
       asteroids.get(i).render();
     }
-    for (int i = 0; i < enemy.size(); i++) {
-      enemy.get(i).updatePos();
-      enemy.get(i).edgeDetection();
-      enemy.get(i).render();
+    
+    if (enemy != null){
+      enemy.updatePos();
+      enemy.edgeDetection();
+      enemy.render();
     }
+    
     for (int i = 0; i < laser.size(); i++) {
       laser.get(i).updatePos();
       laser.get(i).edgeDetection();
@@ -333,6 +336,18 @@ class bullet {
    }
    return false;
  }
+ 
+ boolean collisionDetectionAlien(alien enemy){
+   if (enemy != null){
+    PVector dist = PVector.sub(enemy.position, position);
+    if(dist.mag() < enemy.size){
+     return true; 
+   }
+   return false;
+ }
+ else  return false;
+ }
+ 
   
   void removeBullet() {
     bullets.remove(this);
@@ -429,6 +444,10 @@ class alien {
     } else if (position.y-125 < -buffer) {    // if y position is too high
       position.y = height;    // set the y position to be the bottom of the frame
     }
+  }
+  
+  void removeEnemy() {
+    enemy = null;
   }
 
   void render() {
