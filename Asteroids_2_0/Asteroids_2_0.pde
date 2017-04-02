@@ -33,7 +33,7 @@ void setup() {
   time = millis();
 
   for (int i = 0; i < asteroidCount; i++) {
-    asteroids.add(new asteroid());
+    asteroids.add(new asteroid(40, 0, 800));
   }
 }
 
@@ -403,13 +403,13 @@ class asteroid {
   PVector position, velocity, acceleration;
   float heading, angle, radius;
 
-  asteroid() {
+  asteroid(float r, float b, float c) {
     heading = random(-180, 180);
     angle = heading; //- PI/2; // offset angle because ship is pointing vertical
-    position = new PVector (random(0, 800), random(0, 800));
+    position = new PVector (random(b, c), random(b, c));
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(1.75);
-    radius = 15;
+    radius = r;
   }
 
   void updatePos() {         //update the motion of the object
@@ -432,6 +432,17 @@ class asteroid {
   }
 
   void breakUp() {
+    if (this.radius > 30){
+      float b = this.radius / 2;
+      asteroidCount++;
+      asteroidCount++;
+      float c = this.position.x;
+      float d = this.position.y;
+      asteroids.add(new asteroid(b, c, d));
+      asteroids.add(new asteroid(b, c, d));
+
+      asteroids.remove(this);
+    } else
     asteroids.remove(this);
   }
 
