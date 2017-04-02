@@ -62,6 +62,10 @@ void draw() {
     laser.get(i).updatePos();
     laser.get(i).edgeDetection();
     laser.get(i).render();
+    if (laser.get(i).counterLaser > 80){
+        laser.remove(i);
+        i--;
+      }
   }
   if (millis() - time >= wait) {
     enemy.add(new alien());
@@ -111,7 +115,7 @@ void draw() {
     for (int i = 0; i < bullets.size(); i++) {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
-      bullets.get(i).render(); 
+      bullets.get(i).render();
       if (bullets.get(i).collisionDetection(asteroids)) {
         bullets.remove(i);
         i--;
@@ -119,6 +123,9 @@ void draw() {
         bullets.remove(i);
         i--;
         enemyexists = false;
+      } else if (bullets.get(i).counter > 80){
+        bullets.remove(i);
+        i--;
       }
     }
   } else if (tryAgain) {
@@ -321,6 +328,8 @@ class Spaceship {
 class bullet {
   PVector position, velocity, acceleration;  //create PVectors for motion
   float heading, angle;
+  int counter;
+  int timeout = 48;
 
   bullet() {
     heading = player1.heading;
@@ -328,11 +337,16 @@ class bullet {
     position = new PVector (player1.newPosition.x, player1.newPosition.y);
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(5);
+    counter = 0;
   }
 
   void updatePos() {         //update the motion of the object
     position.add(velocity);    //add the current velocity to the position of the ship
     //acceleration.mult(0);    //reset the acceleration to 0 by multiplication
+    counter++;
+  }
+  void updateTime() {
+    time = time + 1;
   }
 
   void edgeDetection() {  //detects if the ship excceeds the frame edges.
@@ -507,6 +521,7 @@ class Alaser {
   PVector position, velocity, heading;
   float  angle ;
   PVector newPosition;
+  int counterLaser;
 
 
 
@@ -515,6 +530,7 @@ class Alaser {
     position = new PVector(enemy.get(0).newPosition.x,enemy.get(0).newPosition.y);
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(5);
+    counterLaser = 0;
   }
 
   void updatePos() {
