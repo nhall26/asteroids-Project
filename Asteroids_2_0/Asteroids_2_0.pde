@@ -1,10 +1,12 @@
 /******************************* //<>// //<>// //<>//
  Group 14 Asteroids
- Version 2.1
+ Version 2.5
  #TODO#
- Collision detection
- Round counter
+ Improve Collision detection
+ Score counter
  Asteroids based on round no.
+ Implement round counter
+ Fix enemy laser
  *******************************/
 // initialise Variables to be used
 // assign objects of classes
