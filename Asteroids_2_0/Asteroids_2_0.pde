@@ -227,9 +227,6 @@ class Spaceship {
   boolean thrusting = false;  // keeps track of whether the ship is thrusting (for visual purposes)
   int lives = 3;
   boolean die = false;
-  int r = 255;
-  int g = 255;
-  int b = 255;
   // stores the position in relation to the original coordinate matrix
   PVector newPosition;
 
@@ -238,8 +235,7 @@ class Spaceship {
     velocity = new PVector();    //initialises the velocity vector
     acceleration = new PVector();  //initialises the acceleration vector
     newPosition = new PVector(0, 0);  // sets the position of the ship to be centre screen
-  } 
-  
+  }
 
   void updatePos() {         //update the motion of the object
     velocity.add(acceleration);  //add acceleration values to the velocity vector
@@ -352,28 +348,29 @@ class Spaceship {
 class bullet {
   PVector position, velocity, acceleration;  //create PVectors for motion
   float heading, angle;  // store the heading and angle
-  int counter;  // store teh distance counter
+  int counter;  // store the distance counter
   int timeout = 48;
-
+  
+  // default contructor
   bullet() {
-    heading = player1.heading;
+    heading = player1.heading;  // set the ehading to be the same ass player1's heading
     angle = heading - PI/2; // offset angle because ship is pointing vertical
+    // set the position to be the same as player1's original position
     position = new PVector (player1.newPosition.x, player1.newPosition.y);
-    velocity = new PVector (cos(angle), sin(angle));
-    velocity.mult(5);
-    counter = 0;
+    velocity = new PVector (cos(angle), sin(angle));  // assign values to the velocity vector
+    velocity.mult(5); // multiple the values by 5
+    counter = 0;  // set the counter to be 0
   }
 
   void updatePos() {         //update the motion of the object
-    position.add(velocity);    //add the current velocity to the position of the ship
-    //acceleration.mult(0);    //reset the acceleration to 0 by multiplication
-    counter++;
+    position.add(velocity);    //add the current velocity to the position of the bullet
+    counter++;  // increment the counter
   }
   void updateTime() {
-    time = time + 1;
+    time++;  // increment time
   }
 
-  void edgeDetection() {  //detects if the ship excceeds the frame edges.
+  void edgeDetection() {  //detects if the bullets excceeds the frame edges.
     float buffer = 10;    //set the buffer to be the size of the shape * 2
     if (position.x > width + buffer) {  // if the x position is too far right
       position.x = -buffer;    // set the x position to be the negative buffer (-20)
@@ -386,7 +383,8 @@ class bullet {
       position.y = height;    // set the y position to be the bottom of the frame
     }
   }
-
+  
+  // collision detection for the bullets, same as ship collision
   boolean collisionDetection(ArrayList<asteroid> asteroids) {
     for (asteroid a : asteroids) {
       PVector dist = PVector.sub(a.position, position);
@@ -397,6 +395,7 @@ class bullet {
     }
     return false;
   }
+  // collision detection for bullets on enemy
   boolean collisionDetection2(ArrayList<alien> enemy) {
     for (alien a : enemy) {
       PVector dist = PVector.sub(a.position, position);
@@ -407,24 +406,24 @@ class bullet {
     }
     return false;
   }
-
+  // remove bullet from the array
   void removeBullet() {
     bullets.remove(this);
   }
-
-
+  // render the bulelts
   void render() {
     pushMatrix();  //saves current coordinate system to the stack
     translate(position.x, position.y);  //moves the coordinate system origin to the given points
-    rotate(heading);  //rotate the ship according to its current heading
+    rotate(heading);  //rotate the bullet according to its current heading
     fill(255);
     ellipse(0, 0, 5, 5);
     popMatrix();
   }
 }
 
+// begin the asteroid class
 class asteroid {
-  PVector position, velocity, acceleration;
+  PVector position, velocity, acceleration;  // standard vectors for movement
   float heading, angle, radius;
   
   /*Take input of 3 floats, Radius of the asteroid = r, and use rand position to spawn asteroid. 
@@ -444,16 +443,16 @@ class asteroid {
     //acceleration.mult(0);    //reset the acceleration to 0 by multiplication
   }
 
-  void edgeDetection() {  //detects if the asteroid excceeds the frame edges.
-    float buffer = 10;    //set the buffer to be the size of the shape * 2
+  void edgeDetection() {  //detects if the asteroid exceeds the frame edges.
+    float buffer = 10;    //set the buffer to be the 10
     if (position.x > width + buffer) {  // if the x position is too far right
       position.x = -buffer;    // set the x position to be the negative buffer (-20)
     } else if (position.x < -buffer) {  // if the x position is too far left
       position.x = width;  // set the x position to be the width of the canvas
     }
     if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y - 110 < -buffer) {    // if y position is too high
+      position.y = -buffer+150;  // set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y - 150 < -buffer) {    // if y position is too high
       position.y = height;    // set the y position to be the bottom of the frame
     }
   }
@@ -463,8 +462,7 @@ class asteroid {
     //if radius is larger than 15 then split otherwise just remove the asteroid.
     if (this.radius > 15){
       float b = this.radius / 2; // Take the radius and divide by 2 for creation of new asteroid.
-      asteroidCount++; //increment asteroid count by 2 for the two new asteroids.
-      asteroidCount++;
+      asteroidCount += 2; //increment asteroid count by 2 for the two new asteroids.
       float c = this.position.x; // take the x position for use in the creation of new asteroids
       float d = this.position.y; // take the y position for use in the creation of new asteroids
       asteroids.add(new asteroid(b, c, d)); //creation of new asteroid with b, c, and d
@@ -484,6 +482,7 @@ class asteroid {
   }
 }  
 
+// begin the alien class
 class alien {
   PVector position, velocity ;
   float heading, angle, radius;
