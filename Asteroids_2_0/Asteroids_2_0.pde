@@ -7,139 +7,175 @@
  Asteroids based on round no.
  *******************************/
 // initialise Variables to be used
+// assign objects of classes
 Spaceship player1;
+// create dynamic arrays to store each of the following objects
 ArrayList<bullet> bullets;
 ArrayList<asteroid> asteroids;
 ArrayList<alien> enemy;
 ArrayList<Alaser> laser;
+// tracka whether the player wishes to try again after death
 boolean tryAgain = false;
+// just used for the timer on the try again screen
 int tryAgainCount = 4;
+// store the amount of asteroids per round
 int asteroidCount = 5;
+// What does this track?
 int alienCount = 1;
 int laserCount = 1;
 int time;
+// stores the amount of time that should pass before the alien comes
 int wait = 10000;
-boolean enemyexists;
+boolean enemyExists;
 
 
 void setup() {
+  // set a canvas size of 800x800
   size(800, 800);
   frameRate(60);
+  // initialise each array and object
   bullets = new ArrayList<bullet>();
   player1 = new Spaceship();
   asteroids = new ArrayList<asteroid>();
   enemy = new ArrayList<alien>();
   laser = new ArrayList<Alaser>();
   time = millis();
-
+  
   for (int i = 0; i < asteroidCount; i++) {
     asteroids.add(new asteroid(30, 0, 800));
   }
 }
 
 void draw() {
+  // black background
   background(0);
   //stroke(255,0,0);
   //line(0,height/2, width, height/2);
   //line(width/2,0, width/2, height);
-  text(player1.newPosition.x, 300, 40);
-  text(player1.newPosition.y, 450, 40);
-  text(bullets.size(), 300, 70);
-  text("LIVES", 90, 40);
+  //text(player1.newPosition.x, 300, 40);
+  //text(player1.newPosition.y, 450, 40);
+  //text(bullets.size(), 300, 70);
   //print(enemy.heading.x);
-
-  for (int i = 0; i < asteroids.size(); i++) {
-    asteroids.get(i).updatePos();
-    asteroids.get(i).edgeDetection();
-    asteroids.get(i).render();
-  }
-  for (int i = 0; i < enemy.size(); i++) {
-    enemy.get(i).updatePos();
-    enemy.get(i).edgeDetection();
-    enemy.get(i).render();
-  }
-  for (int i = 0; i < laser.size(); i++) {
-    laser.get(i).updatePos();
-    laser.get(i).edgeDetection();
-    laser.get(i).render();
-    if (laser.get(i).counterLaser > 80){
-        laser.remove(i);
-        i--;
-      }
-  }
-  if (millis() - time >= wait) {
-    enemy.add(new alien());
-    enemyexists = true;
-    time = millis();
-  }
-  if (enemyexists == true){
-    laser.add(new Alaser());
-  }
-
-
+  
+  // run the main program while the player still has lives
   if (player1.lives >= 0) {
-
+    // gernate the header
     header();
-    player1.updatePos();  // Update position
-    player1.edgeDetection();  // check to see if the ship has exceeded the edges of the frame
-    player1.render();    // render the ship  
+    // Update position
+    player1.updatePos();  
+    // check to see if the ship has exceeded the edges of the frame
+    player1.edgeDetection();
+    // render the ship
+    player1.render();
+    // if the player collides with the asteroids
     if (player1.collisionDetection(asteroids)) {
+        // make the player die
         player1.death();
+        // delay the screen for a moment
         delay(50);
+        // reset the player
         player1.reset();
       } else if (player1.collisionDetection2(enemy)) {
+        // if the player collides with the enemy ship, call the death function
         player1.death();
+        // delay the screne a moment
         delay(50);
+        // reset the player
         player1.reset();
-        enemyexists = false;
+        // set eth enemyExists variable to false
+        enemyExists = false;
       }
+    // generate asteroids
+    for (int i = 0; i < asteroids.size(); i++) {
+      asteroids.get(i).updatePos();
+      asteroids.get(i).edgeDetection();
+      asteroids.get(i).render();
+    }
+    // generate and update the enemy ship
+    for (int i = 0; i < enemy.size(); i++) {
+      enemy.get(i).updatePos();
+      enemy.get(i).edgeDetection();
+      enemy.get(i).render();
+    }
+    // generate and update the enemy laser
+    for (int i = 0; i < laser.size(); i++) {
+      laser.get(i).updatePos();
+      laser.get(i).edgeDetection();
+      laser.get(i).render();
+      if (laser.get(i).counterLaser > 80){
+          laser.remove(i);
+          i--;
+        }
+    }
+    if ((millis() - time >= wait) & !enemyExists) {
+      enemy.add(new alien());
+      enemyExists = true;
+      time = millis();
+    }
+    if (enemyExists == true){
+      laser.add(new Alaser());
+    }
 
     //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
-
+    
+    // display controls
     fill(255);
-    text("left right arrows to turn, up arrow to thrust", 10, height-5);
-    if (keyPressed) {    // Turn or thrust the ship depending on what key is pressed
+    textAlign(CENTER);
+    text("Use Left and Right to rotate, Up to thrust and Space to fire!", 400, height-5);
+    // turn or thrust the ship bassed in input
+    if (keyPressed) {
       if (key == CODED && keyCode == LEFT) {
         player1.turnShip(-0.06);
       } else if (key == CODED && keyCode == RIGHT) {
         player1.turnShip(0.06);
       } else if (key == CODED && keyCode == UP) {
         player1.thrust();
-      } else if (key == CODED && keyCode == DOWN) {
-        player1.death();
-        delay(50);
-        player1.reset();
       }
     }
-
+    // update each bullet that the player fires
     for (int i = 0; i < bullets.size(); i++) {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
       bullets.get(i).render();
+      // check if the bullets collide with anything or have travelled a certain distance
       if (bullets.get(i).collisionDetection(asteroids)) {
         bullets.remove(i);
         i--;
       } else if (bullets.get(i).collisionDetection2(enemy)) {
         bullets.remove(i);
         i--;
-        enemyexists = false;
+        enemyExists = false;
       } else if (bullets.get(i).counter > 80){
         bullets.remove(i);
         i--;
       }
     }
-  } else if (tryAgain) {
+  } 
+  // if the payer hs no lives, display the following
+  else if (tryAgain) {
     background(0);
     if (tryAgainCount > 0) {
       text("Starting in " + (tryAgainCount-1), width/2, height/2);
       delay(1000);
       tryAgainCount--;
-    } else { //if(tryAgainCount < 0) {
-      player1.lives = 3;
+    } else {
+      // reset all of the arrays
+      bullets = new ArrayList<bullet>();
+      player1 = new Spaceship();
+      asteroids = new ArrayList<asteroid>();
+      enemy = new ArrayList<alien>();
+      laser = new ArrayList<Alaser>();
+      asteroidCount = 5;
+      for (int i = 0; i < asteroidCount; i++) {
+        asteroids.add(new asteroid(30, 0, 800));
+      }
+      time = millis();
+      enemyExists = false;      
       tryAgainCount = 3;
       tryAgain = false;
     }
   } else {
+    // display the game over screen
     textSize(50);
     textAlign(CENTER);
     text("GAME OVER", width/2, height/2);
@@ -149,28 +185,16 @@ void draw() {
     }
   }
 }
-/*
-void keyPressed() {
- if (key == CODED && keyCode == LEFT) {
- player1.turnShip(-0.06);
- } else if (key == CODED && keyCode == RIGHT) {
- player1.turnShip(0.06);
- } else if (key == CODED && keyCode == UP) {
- player1.thrust();
- } else if (key == CODED && keyCode == DOWN) {
- player1.death();
- delay(50);
- player1.reset();
- }
- }*/
-
+// when the space bar is released, fire a bullet
 void keyReleased() {
   if (key == ' ') {
     bullets.add(new bullet());
   }
 }
-
+// display the header
 void header() {
+  
+  text("LIVES", 90, 40);
   strokeCap(SQUARE);
   stroke(255);
   strokeWeight(10);
@@ -178,7 +202,9 @@ void header() {
   line(200, 0, 200, 100);
   textSize(25);
   textAlign(CENTER);
-
+  text("Asteroids - COSC101", 500,40);
+  text("SCORE", 500,70);
+  // display the player ship for the amount of lives the player has
   for (int i = 0; i < player1.lives; i++) {
     noFill();
     strokeWeight(2);
@@ -191,33 +217,29 @@ void header() {
   }
 }
 
+// begin the Spaceship class
 class Spaceship {
   PVector position, velocity, acceleration;  //create PVectors for motion
   float damping = 0.995;  //damping value allows the gradual slow down effect
   float topspeed = 6;    //set the topspeed of the ship
   float heading = 0;    //set the heading (direction) of the ship
   int size = 10;      //set the size of the bounding box containing the ship
-  boolean thrusting = false;  //keeps track of whether the ship is thrusting (for visual purposes)
+  boolean thrusting = false;  // keeps track of whether the ship is thrusting (for visual purposes)
   int lives = 3;
   boolean die = false;
   int r = 255;
   int g = 255;
   int b = 255;
+  // stores the position in relation to the original coordinate matrix
   PVector newPosition;
-
 
   Spaceship() {  //the default spaceship object
     position = new PVector(width/2, height/2);  // sets the initial position to be center-screen
     velocity = new PVector();    //initialises the velocity vector
     acceleration = new PVector();  //initialises the acceleration vector
-    newPosition = new PVector(0, 0);
+    newPosition = new PVector(0, 0);  // sets the position of the ship to be centre screen
   } 
-
-  void setStrokeColour(int red, int green, int blue) {
-    r = red;
-    g = green;
-    b = blue;
-  }
+  
 
   void updatePos() {         //update the motion of the object
     velocity.add(acceleration);  //add acceleration values to the velocity vector
@@ -232,7 +254,7 @@ class Spaceship {
     acceleration.add(f);      // add the values in th ef vector to those in acceleration
   }
 
-  void turnShip(float angle) {
+  void turnShip(float angle) {  // rotate teh ship
     heading += angle;
   }
 
@@ -268,6 +290,7 @@ class Spaceship {
     }  
     return false;
   }
+  
   boolean collisionDetection2(ArrayList<alien> enemy) {
     for (alien a : enemy) {
       PVector dist = PVector.sub(a.position, position);
@@ -298,7 +321,7 @@ class Spaceship {
       endShape();        // finish creating the shape
     }
     fill(0);  // fill black (that way the flame doesn't start in the shape)
-    stroke(r, g, b);    // set a white stroke
+    stroke(255);    // set a white stroke
     strokeWeight(2);  //set teh stroke weight
     beginShape();          // draw a complex shape
     vertex(-size, size);    //lower left vertex
@@ -311,7 +334,7 @@ class Spaceship {
     thrusting = false;     // set thrusting to false
   }
 
-  void death() {
+  void death() {  // decrement the lvies of the player and set die to true
     lives--;
     die = true;
   }
@@ -325,10 +348,11 @@ class Spaceship {
   }
 }
 
+// begin the bullet class
 class bullet {
   PVector position, velocity, acceleration;  //create PVectors for motion
-  float heading, angle;
-  int counter;
+  float heading, angle;  // store the heading and angle
+  int counter;  // store teh distance counter
   int timeout = 48;
 
   bullet() {
