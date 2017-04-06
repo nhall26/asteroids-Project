@@ -1,13 +1,9 @@
-/******************************* //<>//
+/******************************* //<>// //<>//
  Group 14 Asteroids
- Version 2.5
+ Version 2.6
  #TODO#
  Improve Collision detection
- Score counter
- Asteroids based on round no.
- Implement round counter
  Fix enemy laser
- 
  *******************************/
 // initialise Variables to be used
 // assign objects of classes
@@ -17,18 +13,26 @@ ArrayList<bullet> bullets;
 ArrayList<asteroid> asteroids;
 ArrayList<alien> enemy;
 ArrayList<Alaser> laser;
-// tracka whether the player wishes to try again after death
+// tracks whether the player wishes to try again after death
 boolean tryAgain = false;
 // just used for the timer on the try again screen
 int tryAgainCount = 4;
 // store the amount of asteroids per round
 int asteroidCount = 5;
-// What does this track?
-int alienCount = 1;
-int laserCount = 1;
+// sets the time between each alien shot
+int wait = 1000;
+// stores the variable time
 int time;
-// stores the amount of time that should pass before the alien comes
-int wait = 10000;
+// stores the score the player should reach before an alien will spawn
+int target = 1000;
+// stores what round the player is currently on
+int round = 1;
+// tracks whether the user is currently on the Round Clear screen
+boolean roundOver = false;
+// tracks if the player has decided to move to the next round
+boolean nextRound = false;
+// just used for the timer on the next round screen
+int nextRoundCount = 4;
 boolean enemyExists;
 
 
@@ -87,6 +91,13 @@ void draw() {
         player1.reset();
         // set eth enemyExists variable to false
         enemyExists = false;
+      } else if (player1.collisionDetection3(laser)) {
+        // if the player collides with an enemy laser, call the death function
+        player1.death();
+        // delay the screne a moment
+        delay(50);
+        // reset the player
+        player1.reset();
       }
     // generate asteroids
     for (int i = 0; i < asteroids.size(); i++) {
@@ -110,13 +121,16 @@ void draw() {
           i--;
         }
     }
-    if ((millis() - time >= wait) & !enemyExists) {
+    if ((player1.score >= target) & !enemyExists) {
       enemy.add(new alien());
       enemyExists = true;
-      time = millis();
+      target += 1000;   //Increment target by 1000 so that another enemy will spawn after another 1000 points.
     }
     if (enemyExists == true){
-      laser.add(new Alaser());
+      if (millis() - time >= wait) {
+        laser.add(new Alaser());
+        time = millis();
+      }
     }
 
     //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
@@ -126,7 +140,7 @@ void draw() {
     textAlign(CENTER);
     text("Use Left and Right to rotate, Up to thrust and Space to fire!", 400, height-5);
     // turn or thrust the ship bassed in input
-    if (keyPressed) {
+    if (keyPressed && roundOver == false) {
       if (key == CODED && keyCode == LEFT) {
         player1.turnShip(-0.06);
       } else if (key == CODED && keyCode == RIGHT) {
@@ -153,6 +167,42 @@ void draw() {
         i--;
       }
     }
+    
+    //If all asteroids and enemies have been destroyed, move on to next round.
+    if (nextRound == true) {
+      if (nextRoundCount > 0) {
+        textSize(50);
+        textAlign(CENTER);
+        text("Starting in " + (nextRoundCount-1), width/2, height/2);
+        delay(1000);
+        nextRoundCount--;
+      } else {
+        roundOver = false;
+        round += 1;
+        asteroidCount += 2;  // Increase asteroid count so that the next round is harder.
+        player1.position = new PVector(width/2, height/2);  // Reset player's position
+        player1.velocity = new PVector(0, 0); // Reset the player's velocity
+        player1.heading = 0;    //Reset the player's direction
+        bullets = new ArrayList<bullet>();  // Remove bullets currently on screen
+        laser = new ArrayList<Alaser>();  // Remove lasers currently on screen
+        for (int i = 0; i < asteroidCount; i++) {
+          asteroids.add(new asteroid(30, 0, 800));  // Spawn in new asteroids.
+        }
+        roundOver = false;
+        nextRound = false;
+        nextRoundCount = 4;
+      }
+    } else if (asteroids.size() == 0 && enemy.size() == 0) {
+      roundOver = true;
+      textSize(50);
+      textAlign(CENTER);
+      text("WELL DONE", width/2, height/2 - 100);
+      text("You cleared Round " + str(round), width/2, height/2);
+      text("Press any key to continue", width/2, height/2 + 100);
+      if (keyPressed) {
+        nextRound = true;
+        }
+    } 
   } 
   // if the payer hs no lives, display the following
   else if (tryAgain) {
@@ -176,12 +226,14 @@ void draw() {
       enemyExists = false;      
       tryAgainCount = 3;
       tryAgain = false;
+      round = 1;
     }
   } else {
     // display the game over screen
     textSize(50);
     textAlign(CENTER);
-    text("GAME OVER", width/2, height/2);
+    text("GAME OVER", width/2, height/2 - 100);
+    text("Your score was " + str(player1.score), width/2, height/2);
     text("Press any key to try again.", width/2, height/2 + 100);
     if (keyPressed) {
       tryAgain = true;
@@ -197,16 +249,17 @@ void keyReleased() {
 // display the header
 void header() {
   
+  textSize(25);
   text("LIVES", 90, 40);
   strokeCap(SQUARE);
   stroke(255);
   strokeWeight(10);
   line(0, 100, width, 100);
   line(200, 0, 200, 100);
-  textSize(25);
   textAlign(CENTER);
   text("Asteroids - COSC101", 500,40);
-  text("SCORE", 500,70);
+  text("ROUND: " + round, 350, 70);
+  text("SCORE: " + player1.score, 650,70);
   // display the player ship for the amount of lives the player has
   for (int i = 0; i < player1.lives; i++) {
     noFill();
@@ -232,6 +285,7 @@ class Spaceship {
   boolean die = false;
   // stores the position in relation to the original coordinate matrix
   PVector newPosition;
+  int score = 0;    //tracks the current score of the player
 
   Spaceship() {  //the default spaceship object
     position = new PVector(width/2, height/2);  // sets the initial position to be center-screen
@@ -295,6 +349,16 @@ class Spaceship {
       PVector dist = PVector.sub(a.position, position);
       if (dist.mag() < a.radius) {
         a.breakUp();
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  boolean collisionDetection3(ArrayList<Alaser> laser) {
+    for (Alaser a : laser) {
+      PVector dist = PVector.sub(a.position, position);
+      if (dist.mag() < 2.5) {
         return true;
       }
     }
@@ -393,6 +457,11 @@ class bullet {
       PVector dist = PVector.sub(a.position, position);
       if (dist.mag() < a.radius) {
         a.breakUp();
+        if (a.radius > 15) {  // If radius > 15, the asteroid will break into two smaller asteroids instead of being destroyed
+          player1.score += 50;
+        } else {  // Otherwise, the asteroid is completely destroyed.
+          player1.score += 100;
+        }
         return true;
       }
     }
@@ -404,6 +473,7 @@ class bullet {
       PVector dist = PVector.sub(a.position, position);
       if (dist.mag() < a.radius) {
         a.breakUp();
+        player1.score += 200;
         return true;
       }
     }
@@ -465,7 +535,6 @@ class asteroid {
     //if radius is larger than 15 then split otherwise just remove the asteroid.
     if (this.radius > 15){
       float b = this.radius / 2; // Take the radius and divide by 2 for creation of new asteroid.
-      asteroidCount += 2; //increment asteroid count by 2 for the two new asteroids.
       float c = this.position.x; // take the x position for use in the creation of new asteroids
       float d = this.position.y; // take the y position for use in the creation of new asteroids
       asteroids.add(new asteroid(b, c, d)); //creation of new asteroid with b, c, and d
@@ -485,33 +554,35 @@ class asteroid {
   }
 }  
 
-// begin the alien class
+// Begin the alien class
 class alien {
-  PVector position, velocity ;
-  float heading, angle, radius;
+  PVector position, velocity; //PVectors for motion
+  float heading, angle, radius; //Store variables
   int size = 30;
-  PVector newPosition;
 
   alien() {
     heading = random(-180, 180);
-    position = new PVector (random(0, 800), random(0, 800));
     angle = heading;
+    position = new PVector (random(0, 800), random(0, 800));
     velocity = new PVector (cos(angle), sin(angle));
-    velocity.mult(3);
-    radius = 15;
-    newPosition = new PVector (0, 0);
+    velocity.mult(3); // Sets the speed of the alien
+    radius = 15; // Sets variable to use for shape creation
   }
 
+  // Function to add the velocity to the position
   void updatePos() {
     position.add(velocity);
-  }   
+  }  
+  
+  // Function to remove the alien
   void breakUp() {
     enemy.remove(this);
   }
+  
+  // Function to spawn an alien, dependant on score
   void spawn() {
-    if (millis() - time >= wait) {
+    if (player1.score >= target) {
       enemy.add(new alien());
-      time = millis();
     }
   }
 
@@ -530,9 +601,9 @@ class alien {
   }
 
   void render() {
-    pushMatrix();
-    translate(position.x, position.y+size);
-    fill(0);
+    pushMatrix();  //Saves current coordinate system to the stack
+    translate(position.x, position.y+size);  //Moves the coordinate system origin to the given points
+    fill(0);  //Begins the creation of the shape for the alien
     stroke(255, 255, 255);
     beginShape();
     vertex(size/2-15, size*1/5-45);
@@ -553,29 +624,28 @@ class alien {
     endShape(CLOSE);
     line(0-15, size*3/4-45, size-15, size*3/4-45);
     ellipse(size/2-15, size*8/15-45, 2, 2);
-    newPosition = new PVector(position.x + sin(heading) * size, position.y+size + cos(heading) * -size);
-    popMatrix();
+    popMatrix();  //Restores the previous coordinate system
   }
 }
 
+//Begin the Alaser Class
 class Alaser {
-  PVector position, velocity, heading;
-  float  angle ;
-  PVector newPosition;
+  PVector position, velocity; //PVectors for motion
   int counterLaser;
 
 
 
   Alaser() {
-    heading = new PVector(sin(player1.position.x), cos(player1.position.y));
-    position = new PVector(enemy.get(0).newPosition.x,enemy.get(0).newPosition.y);
-    velocity = new PVector (cos(angle), sin(angle));
+    position = new PVector(enemy.get(0).position.x,enemy.get(0).position.y);  // Makes initial start position the (x,y) of the alien
+    velocity = PVector.sub(player1.position, this.position);
+    velocity.normalize();
     velocity.mult(5);
     counterLaser = 0;
   }
 
+  //Function to add the velocity to the position
   void updatePos() {
-    position.add(heading);
+    position.add(velocity);
     counterLaser++;
   }
   void edgeDetection() {  //detects if the ship excceeds the frame edges.
@@ -592,11 +662,11 @@ class Alaser {
     }
   }
   void render() {
-    pushMatrix();
-    translate(position.x, position.y);
+    pushMatrix(); //Saves current coordinate system to the stack
+    translate(position.x, position.y); //Moves the coordinate system origin to the given points
     fill(0);
-    stroke(255, 255, 255);
-    ellipse(0, 0, 5, 5);
-    popMatrix();
+    stroke(255);
+    ellipse(0, 0, 5, 5); // Creates the shape
+    popMatrix(); // Restores the previous coordinate system
   }
 }
