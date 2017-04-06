@@ -1,4 +1,4 @@
-/******************************* //<>// //<>// //<>//
+/******************************* //<>//
  Group 14 Asteroids
  Version 2.5
  #TODO#
@@ -7,6 +7,7 @@
  Asteroids based on round no.
  Implement round counter
  Fix enemy laser
+ 
  *******************************/
 // initialise Variables to be used
 // assign objects of classes
