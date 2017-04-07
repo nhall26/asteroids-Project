@@ -1,46 +1,80 @@
-/******************************* //<>// //<>//
- Group 14 Asteroids
- Version 2.6
- #TODO#
+/* //<>//
+ # Group 14 Asteroids #
+ ---------------------------------------
+ Version 2.7
+ ------------------------------------------
+ Authors: 
+     Sam Williamson
+     Name
+     Name
+     Name
+ ------------------------------------------
+ Purpose: 
+        "To work in your teams to develop 
+ your own version of the asteroids game 
+ using the Processing environment.
+ ------------------------------------------
+ How To Run:
+        Simply click the "Run" button above
+ to compile the game, it will open in a
+ large window.
+ ------------------------------------------
+ Controls:
+       UP - Thrust/Move Forward
+       LEFT - Rotate the ship anticlockwise
+       RIGHT - Rotate the ship clockwise
+       SPACE - Fire projectile
+ ------------------------------------------
+ # TODO #
  Improve Collision detection
- Fix enemy laser
- *******************************/
-// initialise Variables to be used
-// assign objects of classes
+ ------------------------------------------
+
+*/
+ 
+// Initialise Variables to be used
+// Assign objects of classes
 Spaceship player1;
-// create dynamic arrays to store each of the following objects
+// Create dynamic arrays to store each of the following objects
 ArrayList<bullet> bullets;
 ArrayList<asteroid> asteroids;
 ArrayList<alien> enemy;
 ArrayList<Alaser> laser;
-// tracks whether the player wishes to try again after death
+// Tracks whether the player wishes to try again after death
 boolean tryAgain = false;
-// just used for the timer on the try again screen
+// Just used for the timer on the try again screen
 int tryAgainCount = 4;
-// store the amount of asteroids per round
+// Store the amount of asteroids per round
 int asteroidCount = 5;
-// sets the time between each alien shot
+// Sets the time between each alien shot
 int wait = 1000;
-// stores the variable time
+// Stores the variable time
 int time;
-// stores the score the player should reach before an alien will spawn
+// Stores the score the player should reach before an alien will spawn
 int target = 1000;
-// stores what round the player is currently on
+// Stores what round the player is currently on
 int round = 1;
-// tracks whether the user is currently on the Round Clear screen
+// Tracks whether the user is currently on the Round Clear screen
 boolean roundOver = false;
-// tracks if the player has decided to move to the next round
+// Tracks if the player has decided to move to the next round
 boolean nextRound = false;
-// just used for the timer on the next round screen
+// Just used for the timer on the next round screen
 int nextRoundCount = 4;
 boolean enemyExists;
 
-
 void setup() {
-  // set a canvas size of 800x800
+  /* 
+      Function:
+        Initial setup function
+      Author:
+        Group effort
+      Description:
+        Initialises required arrays, creates and populates them
+        Also creates the canvas.      
+  */
+  // Set a canvas size of 800x800
   size(800, 800);
   frameRate(60);
-  // initialise each array and object
+  // Initialise each array and object
   bullets = new ArrayList<bullet>();
   player1 = new Spaceship();
   asteroids = new ArrayList<asteroid>();
@@ -49,76 +83,82 @@ void setup() {
   time = millis();
   
   for (int i = 0; i < asteroidCount; i++) {
-    asteroids.add(new asteroid(30, 0, 800, 0, 800));
+    asteroids.add(new asteroid(30, 0, 800, 0, 800, false));
   }
 }
 
 void draw() {
-  // black background
+  /* 
+      Function:
+        Draw function
+      Author:
+        Group effort, foundations laid by Sam.
+      Description:
+        Draws everything in the program
+        Perform the majority of the game while the player has lives as follows
+          1 - Update each object first with new parameters
+          2 - Check the new position to see if it needs to wrap around the edges
+          3 - Render the object
+          4 - Check for collisions
+          5 - Repeat for "x" amount of objects
+  */
+  // Black background
   background(0);
-  //stroke(255,0,0);
-  //line(0,height/2, width, height/2);
-  //line(width/2,0, width/2, height);
-  //text(player1.newPosition.x, 300, 40);
-  //text(player1.newPosition.y, 450, 40);
-  //text(bullets.size(), 300, 70);
-  //print(enemy.heading.x);
-  
-  // run the main program while the player still has lives
+  // Run the main program while the player still has lives
   if (player1.lives >= 0) {
-    // gernate the header
+    // Gernate the header
     header();
     // Update position
     player1.updatePos();  
-    // check to see if the ship has exceeded the edges of the frame
+    // Check to see if the ship has exceeded the edges of the frame
     player1.edgeDetection();
-    // render the ship
+    // Render the ship
     player1.render();
-    // if the player collides with the asteroids
+    // If the player collides with the asteroids
     if (player1.collisionDetection(asteroids)) {
-        // make the player die
+        // Make the player die
         player1.death();
-        // delay the screen for a moment
+        // Delay the screen for a moment
         delay(50);
-        // reset the player
+        // Reset the player
         player1.reset();
       } else if (player1.collisionDetection2(enemy)) {
-        // if the player collides with the enemy ship, call the death function
+        // If the player collides with the enemy ship, call the death function
         player1.death();
-        // delay the screne a moment
+        // Delay the screne a moment
         delay(50);
-        // reset the player
+        // Reset the player
         player1.reset();
-        // set eth enemyExists variable to false
+        // Set eth enemyExists variable to false
         enemyExists = false;
       } else if (player1.collisionDetection3(laser)) {
-        // if the player collides with an enemy laser, call the death function
+        // If the player collides with an enemy laser, call the death function
         player1.death();
-        // delay the screne a moment
+        // Delay the screne a moment
         delay(50);
-        // reset the player
+        // Reset the player
         player1.reset();
       }
-    // generate asteroids
+    // Generate asteroids
     for (int i = 0; i < asteroids.size(); i++) {
       asteroids.get(i).updatePos();
       asteroids.get(i).edgeDetection();
       asteroids.get(i).render();
     }
-    // generate and update the enemy ship
+    // Generate and update the enemy ship
     for (int i = 0; i < enemy.size(); i++) {
       enemy.get(i).updatePos();
       enemy.get(i).edgeDetection();
       enemy.get(i).render();
     }
-    // generate and update the enemy laser
+    // Generate and update the enemy laser
     for (int i = 0; i < laser.size(); i++) {
       laser.get(i).updatePos();
       laser.get(i).edgeDetection();
       laser.get(i).render();
-      if (laser.get(i).counterLaser > 80){ // if laser counter > 80 thhen remove laser
-          laser.remove(i); // remove laser at index (i)
-          i--; // deincrement i so that it is the same length as laser size
+      if (laser.get(i).counterLaser > 80){ // If laser counter > 80 thhen remove laser
+          laser.remove(i); // Remove laser at index (i)
+          i--; // Deincrement i so that it is the same length as laser size
         }
     }
     if ((player1.score >= target) & !enemyExists) {
@@ -126,20 +166,19 @@ void draw() {
       enemyExists = true;
       target += 1000;   //Increment target by 1000 so that another enemy will spawn after another 1000 points.
     }
-    if (enemyExists == true){
+    
+    if (enemyExists == true) {
       if (millis() - time >= wait) {
         laser.add(new Alaser());
         time = millis();
       }
     }
-
-    //ellipse(player1.newPosition.x, player1.newPosition.y, 5, 5);
     
-    // display controls
+    // Display controls
     fill(255);
     textAlign(CENTER);
     text("Use Left and Right to rotate, Up to thrust and Space to fire!", 400, height-5);
-    // turn or thrust the ship bassed in input
+    // Turn or thrust the ship bassed in input
     if (keyPressed && roundOver == false) {
       if (key == CODED && keyCode == LEFT) {
         player1.turnShip(-0.06);
@@ -149,27 +188,29 @@ void draw() {
         player1.thrust();
       }
     }
-    // update each bullet that the player fires
+    
+    // Update each bullet that the player fires
     for (int i = 0; i < bullets.size(); i++) {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
       bullets.get(i).render();
-      // check if the bullets collide with anything or have travelled for a certain time
-      if (bullets.get(i).collisionDetection(asteroids)) { // if any bullets i collides with any asteroids then remove bullets and i--
-        bullets.remove(i); // remove bullet at index i
-        i--; // deincrement i so that it is the same size as bullets array length
-      } else if (bullets.get(i).collisionDetection2(enemy)) { // if any bullets i collides with any enemy then remove bullets and i--
-        bullets.remove(i); // remove bullet at index i
-        i--; //deincrement i so that it is the same size as bullets array length
+      // Check if the bullets collide with anything or have travelled for a certain time
+      if (bullets.get(i).collisionDetection(asteroids)) { // If any bullets i collides with any asteroids then remove bullets and i--
+        bullets.remove(i); // Remove bullet at index i
+        i--; // Deincrement i so that it is the same size as bullets array length
+      } else if (bullets.get(i).collisionDetection2(enemy)) { // If any bullets i collides with any enemy then remove bullets and i--
+        bullets.remove(i); // Remove bullet at index i
+        i--; // Deincrement i so that it is the same size as bullets array length
         enemyExists = false;
-      } else if (bullets.get(i).counter > 80){ // otherwise if bullets counter of bullets(i) is greater than 80 then remove bullet
-        bullets.remove(i); // remove bullet at index i
-        i--; // deincrement i so that it is the same size as bullets array length
+      } else if (bullets.get(i).counter > 80){ // Otherwise if bullets counter of bullets(i) is greater than 80 then remove bullet
+        bullets.remove(i); // Remove bullet at index i
+        i--; // Deincrement i so that it is the same size as bullets array length
       }
     }
     
     //If all asteroids and enemies have been destroyed, move on to next round.
     if (nextRound == true) {
+      background(0);
       if (nextRoundCount > 0) {
         textSize(50);
         textAlign(CENTER);
@@ -186,13 +227,14 @@ void draw() {
         bullets = new ArrayList<bullet>();  // Remove bullets currently on screen
         laser = new ArrayList<Alaser>();  // Remove lasers currently on screen
         for (int i = 0; i < asteroidCount; i++) {
-          asteroids.add(new asteroid(30, 0, 800, 0, 800));  // Spawn in new asteroids.
+          asteroids.add(new asteroid(30, 0, 800, 0, 800, true));  // Spawn in new asteroids.
         }
         roundOver = false;
         nextRound = false;
         nextRoundCount = 4;
       }
     } else if (asteroids.size() == 0 && enemy.size() == 0) {
+      background(0);
       roundOver = true;
       textSize(50);
       textAlign(CENTER);
@@ -204,7 +246,7 @@ void draw() {
         }
     } 
   } 
-  // if the payer hs no lives, display the following
+  // If the payer hs no lives, display the following
   else if (tryAgain) {
     background(0);
     if (tryAgainCount > 0) {
@@ -212,7 +254,7 @@ void draw() {
       delay(1000);
       tryAgainCount--;
     } else {
-      // reset all of the arrays
+      // Reset all of the arrays
       bullets = new ArrayList<bullet>();
       player1 = new Spaceship();
       asteroids = new ArrayList<asteroid>();
@@ -220,7 +262,7 @@ void draw() {
       laser = new ArrayList<Alaser>();
       asteroidCount = 5;
       for (int i = 0; i < asteroidCount; i++) {
-        asteroids.add(new asteroid(30, 0, 800, 0, 800));
+        asteroids.add(new asteroid(30, 0, 800, 0, 800, false));
       }
       time = millis();
       enemyExists = false;      
@@ -229,7 +271,7 @@ void draw() {
       round = 1;
     }
   } else {
-    // display the game over screen
+    // Display the game over screen
     textSize(50);
     textAlign(CENTER);
     text("GAME OVER", width/2, height/2 - 100);
@@ -240,15 +282,22 @@ void draw() {
     }
   }
 }
-// when the space bar is released, fire a bullet
+// When the space bar is released, fire a bullet
 void keyReleased() {
   if (key == ' ') {
     bullets.add(new bullet());
   }
 }
-// display the header
+// Display the header
 void header() {
-  
+  /* 
+      Function:
+        Header function
+      Author:
+        Predominantly Sam
+      Description:
+        Displays the top header which shows lives, score and title
+  */
   textSize(25);
   text("LIVES", 90, 40);
   strokeCap(SQUARE);
@@ -260,271 +309,325 @@ void header() {
   text("Asteroids - COSC101", 500,40);
   text("ROUND: " + round, 350, 70);
   text("SCORE: " + player1.score, 650,70);
-  // display the player ship for the amount of lives the player has
+  // Display the player ship for the amount of lives the player has
   for (int i = 0; i < player1.lives; i++) {
     noFill();
     strokeWeight(2);
-    beginShape();          // draw a complex shape
-    vertex(50+i*30, 75);    //lower left vertex
-    vertex(60+i*30, 70);       //lower mid vertex
-    vertex(70+i*30, 75);     //lower right vertex
-    vertex(60+i*30, 55);    //upper mid vertex
-    endShape(CLOSE);       //finished creating shape
+    beginShape();          // Draw a complex shape
+    vertex(50+i*30, 75);    // Lower left vertex
+    vertex(60+i*30, 70);       // Lower mid vertex
+    vertex(70+i*30, 75);     // Lower right vertex
+    vertex(60+i*30, 55);    // Upper mid vertex
+    endShape(CLOSE);       // Finished creating shape
   }
 }
 
-// begin the Spaceship class
+// Begin the Spaceship class
 class Spaceship {
-  //initialise valuees to be used by spaceship
-  PVector position, velocity, acceleration;  //create PVectors for motion
-  float damping = 0.995;  //damping value allows the gradual slow down effect
-  float topspeed = 6;    //set the topspeed of the ship
-  float heading = 0;    //set the heading (direction) of the ship
-  int size = 10;      //set the size of the bounding box containing the ship
-  boolean thrusting = false;  // keeps track of whether the ship is thrusting (for visual purposes)
+  /* 
+      Function:
+        Spaceship class
+      Author:
+        Predominantly Sam, collision detection added by 
+      Description:
+        Creates a Spaceship object that is used to represent the player
+        Used an object oriented approach due to previous familiarity with
+        object-oriented languages. Starting the program like this has
+        resulted in the final project as most classes are loosely based
+        off of this one.
+  */
+  
+  // Initialise valuees to be used by spaceship
+  PVector position, velocity, acceleration;  // Create PVectors for motion
+  float damping = 0.995;  // Damping value allows the gradual slow down effect
+  float topspeed = 6;    // Set the topspeed of the ship
+  float heading = 0;    // Set the heading (direction) of the ship
+  int size = 10;      // Set the size of the bounding box containing the ship
+  boolean thrusting = false;  // Keeps track of whether the ship is thrusting (for visual purposes)
   int lives = 3; // Starting count of lives
-  boolean die = false; // boolean to check dead, set to false to begin.
-  // stores the position in relation to the original coordinate matrix
+  boolean die = false; // Boolean to check dead, set to false to begin.
+  // Stores the position in relation to the original coordinate matrix
   PVector newPosition;
-  int score = 0;    //tracks the current score of the player
+  int score = 0;    // Tracks the current score of the player
 
-  Spaceship() {  //the default spaceship object
-    position = new PVector(width/2, height/2);  // sets the initial position to be center-screen
-    velocity = new PVector();    //initialises the velocity vector
-    acceleration = new PVector();  //initialises the acceleration vector
-    newPosition = new PVector(0, 0);  // sets the position of the ship to be centre screen
+  Spaceship() {  // The default spaceship object
+    position = new PVector(width/2, height/2);  // Sets the initial position to be center-screen
+    velocity = new PVector();    // Initialises the velocity vector
+    acceleration = new PVector();  // Initialises the acceleration vector
+    newPosition = new PVector(0, 0);  // Sets the position of the ship to be centre screen
   }
 
-  void updatePos() {         //update the motion of the object
-    velocity.add(acceleration);  //add acceleration values to the velocity vector
-    velocity.mult(damping);    //multiply the velocity values by the damping value
-    velocity.limit(topspeed);  //limit the velocity to the topspeed variable
-    position.add(velocity);    //add the current velocity to the position of the ship
-    acceleration.mult(0);    //reset the acceleration to 0 by multiplication
+  void updatePos() {         // Update the motion of the object
+    velocity.add(acceleration);  // Add acceleration values to the velocity vector
+    velocity.mult(damping);    // Multiply the velocity values by the damping value
+    velocity.limit(topspeed);  // Limit the velocity to the topspeed variable
+    position.add(velocity);    // Add the current velocity to the position of the ship
+    acceleration.mult(0);    // Reset the acceleration to 0 by multiplication
   }
 
-  void applyForce(PVector force) {  //apply the necessary amount of force
-    PVector f = force.get();  //get the values in the force vector and store them in the f vector
-    acceleration.add(f);      // add the values in th ef vector to those in acceleration
+  void applyForce(PVector force) {  // Apply the necessary amount of force
+    PVector f = force;  // Get the values in the force vector and store them in the f vector
+    acceleration.add(f);      // Add the values in th ef vector to those in acceleration
   }
 
-  void turnShip(float angle) {  // rotate teh ship
+  void turnShip(float angle) {  // Rotate teh ship
     heading += angle;
   }
 
   void thrust() {
-    float angle = heading - PI/2; // offset angle because ship is pointing vertical
-    PVector force = new PVector(cos(angle), sin(angle)); // converts the polar coordinate to cartesian
-    force.mult(0.1);     //multiply the force values by 0.1
-    applyForce(force);   //call the applyForce function
-    thrusting = true;    //set thrusting to true
+    float angle = heading - PI/2; // Offset angle because ship is pointing vertical
+    PVector force = new PVector(cos(angle), sin(angle)); // Converts the polar coordinate to cartesian
+    force.mult(0.1);     // Multiply the force values by 0.1
+    applyForce(force);   // Call the applyForce function
+    thrusting = true;    // Set thrusting to true
   }
 
-  void edgeDetection() {  //detects if the ship excceeds the frame edges.
-    float buffer = size*2;    //set the buffer to be the size of the shape * 2
-    if (position.x > width + buffer) {  // if the x position is too far right
-      position.x = -buffer;    // set the x position to be the negative buffer (-20)
-    } else if (position.x < -buffer) {  // if the x position is too far left
-      position.x = width;  // set the x position to be the width of the canvas
+  void edgeDetection() {  // Detects if the ship excceeds the frame edges.
+    float buffer = size*2;    // Set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // If the x position is too far right
+      position.x = -buffer;    // Set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // If the x position is too far left
+      position.x = width;  // Set the x position to be the width of the canvas
     }
-    if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y-125 < -buffer) {    // if y position is too high
-      position.y = height;    // set the y position to be the bottom of the frame
+    if (position.y > height + buffer) {  // If the y position is too low
+      position.y = -buffer+125;  // Set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y-125 < -buffer) {    // If y position is too high
+      position.y = height;    // Set the y position to be the bottom of the frame
     }
   }
 
   boolean collisionDetection(ArrayList<asteroid> asteroids) {
-    for (asteroid a : asteroids) {//for each asteroid in asteroids go through
-      PVector dist = PVector.sub(a.position, position); //Check the distance between asteroid position and position of player
-      if (dist.mag() < a.radius) { // if dist is in the radius of the player return true and breakup said asteroid
-        a.breakUp(); //call breakup on asteroid
-        return true; //return true
+    for (asteroid a : asteroids) {// For each asteroid in asteroids go through
+      PVector dist = PVector.sub(a.position, position); // Check the distance between asteroid position and position of player
+      if (dist.mag() < a.radius) { // If dist is in the radius of the player return true and breakup said asteroid
+        a.breakUp(); // Call breakup on asteroid
+        return true; // Return true
       }
     }  
-    return false; // return true
+    return false; // Return true
   }
   
   boolean collisionDetection2(ArrayList<alien> enemy) {
-    for (alien a : enemy) { // for each alien in enemy itterate through
+    for (alien a : enemy) { // For each alien in enemy itterate through
       PVector dist = PVector.sub(a.position, position); // Get the distance between alien and position of player
-      if (dist.mag() < a.radius) { // if dist between player and enemy is under the radius of the enemy then destroy alien and return true
-        a.breakUp(); // call breakup on a of enemy
-        return true; // return true
+      if (dist.mag() < a.radius) { // If dist between player and enemy is under the radius of the enemy then destroy alien and return true
+        a.breakUp(); // Call breakup on a of enemy
+        return true; // Return true
       }
     }
-    return false; //return true
+    return false; // Return true
   }
   
   boolean collisionDetection3(ArrayList<Alaser> laser) {
-    for (Alaser a : laser) { // itterate through for each alien laser
-      PVector dist = PVector.sub(a.position, position); // if dist between player and enemy laser is under 2.5 then return true
+    for (Alaser a : laser) { // Itterate through for each alien laser
+      PVector dist = PVector.sub(a.position, position); // If dist between player and enemy laser is under 2.5 then return true
       if (dist.mag() < 2.5) {
-        return true; //return true
+        return true; // Return true
       }
     }
-    return false; //return false
+    return false; // Return false
   }
 
-  void render() {  // render the ship
-    pushMatrix();  //saves current coordinate system to the stack
-    translate(position.x, position.y+size);  //moves the coordinate system origin to the given points
-    rotate(heading);  //rotate the ship according to its current heading    
+  void render() {  // Render the ship
+    pushMatrix();  // Saves current coordinate system to the stack
+    translate(position.x, position.y+size);  // Moves the coordinate system origin to the given points
+    rotate(heading);  // Rotate the ship according to its current heading    
     if (thrusting) {  
-      stroke(255, 0, 0);  // set a red stroke
-      strokeWeight(0.5);  //set teh stroke weight
-      fill(249, 160, 27);  // fill with a red/orange colour
-      beginShape();  // start creating the booster flame
-      vertex(-size+2.5, size-4);  // all the vertexes of the complex shape
+      stroke(255, 0, 0);  // Set a red stroke
+      strokeWeight(0.5);  // Set teh stroke weight
+      fill(249, 160, 27);  // Fill with a red/orange colour
+      beginShape();  // Start creating the booster flame
+      vertex(-size+2.5, size-4);  // All the vertexes of the complex shape
       vertex(-size+5, size+3.5);
       vertex(-size+8.75, size-0.25);
       vertex(1.25, size+8.5);
       vertex(3.75, size-0.25);
       vertex(6.25, size+3.5);
       vertex(size-2.5, size-4);
-      endShape();        // finish creating the shape
+      endShape();        // Finish creating the shape
     }
-    fill(0);  // fill black (that way the flame doesn't start in the shape)
-    stroke(255);    // set a white stroke
-    strokeWeight(2);  //set teh stroke weight
-    beginShape();          // draw a complex shape
-    vertex(-size, size);    //lower left vertex
-    vertex(0, -size);       //upper mid vertex
-    vertex(size, size);     //lower right vertex
-    vertex(0, size*3/5);    //lower mid vertex
-    endShape(CLOSE);       //finished creating shape
+    fill(0);  // Fill black (that way the flame doesn't start in the shape)
+    stroke(255);    // Set a white stroke
+    strokeWeight(2);  // Set teh stroke weight
+    beginShape();          // Draw a complex shape
+    vertex(-size, size);    // Lower left vertex
+    vertex(0, -size);       // Upper mid vertex
+    vertex(size, size);     // Lower right vertex
+    vertex(0, size*3/5);    // Lower mid vertex
+    endShape(CLOSE);       // Finished creating shape
     newPosition = new PVector(position.x + sin(heading) * size, position.y+size + cos(heading) * -size);
-    popMatrix();           //restores the previous coordinate system
-    thrusting = false;     // set thrusting to false
+    popMatrix();           // Restores the previous coordinate system
+    thrusting = false;     // Set thrusting to false
   }
 
-  void death() {  // decrement the lvies of the player and set die to true
+  void death() {  // Decrement the lvies of the player and set die to true
     lives--;
     die = true;
   }
 
   void reset() {
     delay(1000);
-    position = new PVector(width/2, height/2);  // sets the initial position to be center-screen
-    velocity = new PVector();    //initialises the velocity vector
-    acceleration = new PVector();  //initialises the acceleration vector
+    position = new PVector(width/2, height/2);  // Sets the initial position to be center-screen
+    velocity = new PVector();    // Initialises the velocity vector
+    acceleration = new PVector();  // Initialises the acceleration vector
     die = false;
   }
 }
 
-// begin the bullet class
+// Begin the bullet class
 class bullet {
-  PVector position, velocity, acceleration;  //create PVectors for motion
-  float heading, angle;  // store the heading and angle
-  int counter;  // store the distance counter
+  /* 
+      Function:
+        Bullet class
+      Author:
+        Predominantly Sam, Collision detection added by 
+      Description:
+        Creates a bullet object that is used to represent the player's
+        projectiles. This class is very similar to the Spaceship class
+        but doesn't include acceleration due to the projectiles not
+        needing to slow down as they simply disappear.
+  */
+  PVector position, velocity;  // Create PVectors for motion
+  float heading, angle;  // Store the heading and angle
+  int counter;  // Store the distance counter
   
-  // default contructor
+  // Default contructor
   bullet() {
-    heading = player1.heading;  // set the ehading to be the same ass player1's heading
-    angle = heading - PI/2; // offset angle because ship is pointing vertical
-    // set the position to be the same as player1's original position
-    position = new PVector (player1.newPosition.x, player1.newPosition.y); // spawn at player x and y
-    velocity = new PVector (cos(angle), sin(angle));  // assign values to the velocity vector
-    velocity.mult(5); // multiple the values by 5
-    counter = 0;  // set the counter to be 0
+    heading = player1.heading;  // Set the ehading to be the same ass player1's heading
+    angle = heading - PI/2; // Offset angle because ship is pointing vertical
+    // Set the position to be the same as player1's original position
+    position = new PVector (player1.newPosition.x, player1.newPosition.y); // Spawn at player x and y
+    velocity = new PVector (cos(angle), sin(angle));  // Assign values to the velocity vector
+    velocity.mult(5); // Multiple the values by 5
+    counter = 0;  // Set the counter to be 0
   }
 
-  void updatePos() {         //update the motion of the object
-    position.add(velocity);    //add the current velocity to the position of the bullet
-    counter++;  // increment the counter
+  void updatePos() {         // Update the motion of the object
+    position.add(velocity);    // Add the current velocity to the position of the bullet
+    counter++;  // Increment the counter
   }
 
-  void edgeDetection() {  //detects if the bullets excceeds the frame edges.
-    float buffer = 10;    //set the buffer to be the size of the shape * 2
-    if (position.x > width + buffer) {  // if the x position is too far right
-      position.x = -buffer;    // set the x position to be the negative buffer (-20)
-    } else if (position.x < -buffer) {  // if the x position is too far left
-      position.x = width;  // set the x position to be the width of the canvas
+  void edgeDetection() {  // Detects if the bullets excceeds the frame edges.
+    float buffer = 10;    // Set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // If the x position is too far right
+      position.x = -buffer;    // Set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // If the x position is too far left
+      position.x = width;  // Set the x position to be the width of the canvas
     }
-    if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y - 110 < -buffer) {    // if y position is too high
-      position.y = height;    // set the y position to be the bottom of the frame
+    if (position.y > height + buffer) {  // If the y position is too low
+      position.y = -buffer+125;  // Set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y - 110 < -buffer) {    // If y position is too high
+      position.y = height;    // Set the y position to be the bottom of the frame
     }
   }
   
-  // collision detection for the bullets, same as ship collision
+  // Collision detection for the bullets, same as ship collision
   boolean collisionDetection(ArrayList<asteroid> asteroids) {
-    for (asteroid a : asteroids) {//for each asteroid in asteroids go through
-      PVector dist = PVector.sub(a.position, position); // check the distance between asteroid and bullet.
-      if (dist.mag() < a.radius) { // if bullet is inside the asteroid radius, then check for radius size
-        a.breakUp(); // call asteroid breakup function
+    for (asteroid a : asteroids) {// For each asteroid in asteroids go through
+      PVector dist = PVector.sub(a.position, position); // Check the distance between asteroid and bullet.
+      if (dist.mag() < a.radius) { // If bullet is inside the asteroid radius, then check for radius size
+        a.breakUp(); // Call asteroid breakup function
         if (a.radius > 15) {  // If radius > 15, the asteroid will break into two smaller asteroids instead of being destroyed
-          player1.score += 50; // add 50 to player score
+          player1.score += 50; // Add 50 to player score
         } else {  // Otherwise, the asteroid is completely destroyed.
-          player1.score += 100; // add 100 to player score
+          player1.score += 100; // Add 100 to player score
         }
-        return true; // return true
+        return true; // Return true
       }
     }
-    return false; //return false
+    return false; // Return false
   }
-  // collision detection for bullets on enemy
+  // Collision detection for bullets on enemy
   boolean collisionDetection2(ArrayList<alien> enemy) {
-    for (alien a : enemy) { // for each enemy itterate through
-      PVector dist = PVector.sub(a.position, position); // check the distance between bullet and enemy
-      if (dist.mag() < a.radius) { // if bullet is inside the enemy radius then call breakup and add score
-        a.breakUp(); // call breakup
-        player1.score += 200; // add 200 to score
-        return true; // return true
+    for (alien a : enemy) { // For each enemy itterate through
+      PVector dist = PVector.sub(a.position, position); // Check the distance between bullet and enemy
+      if (dist.mag() < a.radius) { // If bullet is inside the enemy radius then call breakup and add score
+        a.breakUp(); // Call breakup
+        player1.score += 200; // Add 200 to score
+        return true; // Return true
       }
     }
-    return false; // return false
+    return false; // Return false
   }
-  // remove bullet from the array
+  // Remove bullet from the array
   void removeBullet() {
-    bullets.remove(this); // removes this bullet from the array
+    bullets.remove(this); // Removes this bullet from the array
   }
-  // render the bulelts
+  // Render the bulelts
   void render() {
-    pushMatrix();  //saves current coordinate system to the stack
-    translate(position.x, position.y);  //moves the coordinate system origin to the given points
-    rotate(heading);  //rotate the bullet according to its current heading
+    pushMatrix();  // Saves current coordinate system to the stack
+    translate(position.x, position.y);  // Moves the coordinate system origin to the given points
+    rotate(heading);  // Rotate the bullet according to its current heading
     fill(255);
     ellipse(0, 0, 5, 5);
     popMatrix();
   }
 }
 
-// begin the asteroid class
+// Begin the asteroid class
 class asteroid {
-  PVector position, velocity, acceleration;  // standard vectors for movement
+  /* 
+      Function:
+        Asteroid class
+      Author:
+        Foundations by Sam, expanded by  
+      Description:
+        Creates an Asteroid object that generates and perforsm all of the
+        functions that the asteroid takes in the game. Sam laid the
+        foundation by first implementing the asteroids and developing the
+        movement of each using sin and cos. A random number is generated
+        between 1 and 2 for large asteroids, and 3 and 4 for small
+        asteroids. This number determines what shape the asteroid should
+        take.
+  */
+  PVector position, velocity;  // Standard vectors for movement
   float heading, angle, radius;
+  int asteroidType;
+  boolean smallAsteroid;
   
   /* Take input of 5 floats, Radius of the asteroid = r, and use rand position to spawn asteroid between our b,c and d,e. 
   /  If default asteroid then anywhere on the map, else used for the split command spawn at the
   /  'split' asteroid position
   */
-  asteroid(float r, float b, float c, float d, float e) {
-    heading = random(-180, 180); // set the heading for our asteroid to move at.
-    angle = heading; //- PI/2; // offset angle because ship is pointing vertical
+  asteroid(float r, float b, float c, float d, float e, boolean small) {
+    heading = random(-180, 180); // Set the heading for our asteroid to move at.
+    angle = heading; //- PI/2; // Offset angle because ship is pointing vertical
     position = new PVector (random(b, c), random(d, e));
+    while (position.x > (player1.position.x - 50) && position.x < (player1.position.x + 50)) {
+      b += 10;
+      c += 10;
+      position.x = random(b,c);
+    }
+    while (position.y > (player1.position.y - 50) && position.y < (player1.position.y + 50)) {
+      d += 10;
+      e += 10;
+      position.y = random(d,e);
+    }
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(1.75);
+    if (small) {
+      asteroidType = int(random(3,5));
+    } else {
+      asteroidType = int(random(1,3));
+    }
     radius = r;
   }
   
-  void updatePos() {         //update the motion of the object
-    position.add(velocity);    //add the current velocity to the position of the ship
-    //acceleration.mult(0);    //reset the acceleration to 0 by multiplication
+  void updatePos() {         // Update the motion of the object
+    position.add(velocity);    // Add the current velocity to the position of the ship
   }
 
-  void edgeDetection() {  //detects if the asteroid exceeds the frame edges.
-    float buffer = 10;    //set the buffer to be the 10
-    if (position.x > width + buffer) {  // if the x position is too far right
-      position.x = -buffer;    // set the x position to be the negative buffer (-20)
-    } else if (position.x < -buffer) {  // if the x position is too far left
-      position.x = width;  // set the x position to be the width of the canvas
+  void edgeDetection() {  // Detects if the asteroid exceeds the frame edges.
+    float buffer = 10;    // Set the buffer to be the 10
+    if (position.x > width + buffer) {  // If the x position is too far right
+      position.x = -buffer;    // Set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // If the x position is too far left
+      position.x = width;  // Set the x position to be the width of the canvas
     }
-    if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+150;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y - 150 < -buffer) {    // if y position is too high
-      position.y = height;    // set the y position to be the bottom of the frame
+    if (position.y > height + buffer) {  // If the y position is too low
+      position.y = -buffer+150;  // Set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y - 150 < -buffer) {    // If y position is too high
+      position.y = height;    // Set the y position to be the bottom of the frame
     }
   }
   
@@ -532,24 +635,83 @@ class asteroid {
   /  remove the old asteroid, remove the old asteroid if it smaller equal to or smaller than 15 and spawn no new asteroids
   */
   void breakUp() {
-    //if radius is larger than 15 then split otherwise just remove the asteroid.
-    if (this.radius > 15){
+    // If radius is larger than 15 then split otherwise just remove the asteroid.
+    if (this.smallAsteroid == false && radius > 15){
       float b = this.radius / 2; // Take the radius and divide by 2 for creation of new asteroid.
-      float c = this.position.x; // take the x position for use in the creation of new asteroids
-      float d = this.position.y; // take the y position for use in the creation of new asteroids
-      asteroids.add(new asteroid(b, c, c, d, d)); //creation of new asteroid with b, c, and d
-      asteroids.add(new asteroid(b, c, c, d, d)); //creation of new asteroid with b, c, and d
-      asteroids.remove(this); // remove old asteroid
+      float c = this.position.x; // Take the x position for use in the creation of new asteroids
+      float d = this.position.y; // Take the y position for use in the creation of new asteroids
+      asteroids.add(new asteroid(b, c, c, d, d, true)); // Creation of new asteroid with b, c, and d
+      asteroids.add(new asteroid(b, c, c, d, d, true)); // Creation of new asteroid with b, c, and d
+      asteroids.remove(this); // Remove old asteroid
     } else
-    asteroids.remove(this); // remove asteroid if radius < 15 and spawn no new asteroids
+    asteroids.remove(this); // Remove asteroid if radius < 15 and spawn no new asteroids
   }
 
   void render() {
-    pushMatrix();  //saves current coordinate system to the stack
-    translate(position.x, position.y);  //moves the coordinate system origin to the given points
-    rotate(heading);  //rotate the ship according to its current heading
-    fill(255);
-    ellipse(0, 0, radius*2, radius*2);
+    pushMatrix();  // Saves current coordinate system to the stack
+    translate(position.x, position.y);  // Moves the coordinate system origin to the given points
+    rotate(heading);  // Rotate the ship according to its current heading
+    fill(0);
+    stroke(255);
+    if (asteroidType == 1) {
+      beginShape();
+      vertex(-24, 0);
+      vertex(-24, -24);
+      vertex(-12, -48);
+      vertex(12, -48);
+      vertex(36, -24);
+      vertex(42, 0);
+      vertex(18, 0);
+      vertex(18, 24);
+      vertex(12, 30);
+      vertex(-6, 30);
+      vertex(-12, 24);
+      endShape(CLOSE);
+    } else if (asteroidType == 2) {
+      beginShape();
+      vertex(-42, 0);
+      vertex(-42, -30);
+      vertex(0, -30);
+      vertex(-12, -48);
+      vertex(12, -48);
+      vertex(42, -36);
+      vertex(42, -24);
+      vertex(18, -12);
+      vertex(48, 12);
+      vertex(36, 30);
+      vertex(18, 12);
+      vertex(-18, 42);
+      endShape(CLOSE);
+    } else if (asteroidType == 3) {
+      beginShape();
+      vertex(-8, 0);
+      vertex(-8, -8);
+      vertex(-4, -16);
+      vertex(4, -16);
+      vertex(12, -8);
+      vertex(14, 0);
+      vertex(6, 0);
+      vertex(6, 8);
+      vertex(4, 10);
+      vertex(-2, 10);
+      vertex(-4, 8);
+      endShape(CLOSE);
+    } else if (asteroidType == 4) {
+      beginShape();
+      vertex(-14, 0);
+      vertex(-14, -10);
+      vertex(0, -10);
+      vertex(-4, -16);
+      vertex(4, -16);
+      vertex(14, -12);
+      vertex(14, -8);
+      vertex(6, -4);
+      vertex(16, 4);
+      vertex(12, 10);
+      vertex(6, 4);
+      vertex(-6, 14);
+      endShape(CLOSE);
+    }
     popMatrix();
   }
 }  
@@ -586,17 +748,17 @@ class alien {
     }
   }
 
-  void edgeDetection() {  //detects if the ship excceeds the frame edges.
-    float buffer = size*2;    //set the buffer to be the size of the shape * 2
-    if (position.x > width + buffer) {  // if the x position is too far right
-      position.x = -buffer;    // set the x position to be the negative buffer (-20)
-    } else if (position.x < -buffer) {  // if the x position is too far left
-      position.x = width;  // set the x position to be the width of the canvas
+  void edgeDetection() {  // Detects if the ship excceeds the frame edges.
+    float buffer = size*2;    // Set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // If the x position is too far right
+      position.x = -buffer;    // Set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // If the x position is too far left
+      position.x = width;  // Set the x position to be the width of the canvas
     }
-    if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y-125 < -buffer) {    // if y position is too high
-      position.y = height;    // set the y position to be the bottom of the frame
+    if (position.y > height + buffer) {  // If the y position is too low
+      position.y = -buffer+175;  // Set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y < -buffer + 175) {    // If y position is too high
+      position.y = height;    // Set the y position to be the bottom of the frame
     }
   }
 
@@ -648,17 +810,17 @@ class Alaser {
     position.add(velocity);
     counterLaser++;
   }
-  void edgeDetection() {  //detects if the ship excceeds the frame edges.
-    float buffer = 10;    //set the buffer to be the size of the shape * 2
-    if (position.x > width + buffer) {  // if the x position is too far right
-      position.x = -buffer;    // set the x position to be the negative buffer (-20)
-    } else if (position.x < -buffer) {  // if the x position is too far left
-      position.x = width;  // set the x position to be the width of the canvas
+  void edgeDetection() {  // Detects if the ship excceeds the frame edges.
+    float buffer = 10;    // Set the buffer to be the size of the shape * 2
+    if (position.x > width + buffer) {  // If the x position is too far right
+      position.x = -buffer;    // Set the x position to be the negative buffer (-20)
+    } else if (position.x < -buffer) {  // If the x position is too far left
+      position.x = width;  // Set the x position to be the width of the canvas
     }
-    if (position.y > height + buffer) {  // if the y position is too low
-      position.y = -buffer+125;  // set the y position to be the top of the frame (125 just makes it appear nicer)
-    } else if (position.y - 110 < -buffer) {    // if y position is too high
-      position.y = height;    // set the y position to be the bottom of the frame
+    if (position.y > height + buffer) {  // If the y position is too low
+      position.y = -buffer+125;  // Set the y position to be the top of the frame (125 just makes it appear nicer)
+    } else if (position.y - 110 < -buffer) {    // If y position is too high
+      position.y = height;    // Set the y position to be the bottom of the frame
     }
   }
   void render() {
