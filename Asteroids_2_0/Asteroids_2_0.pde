@@ -116,9 +116,9 @@ void draw() {
       laser.get(i).updatePos();
       laser.get(i).edgeDetection();
       laser.get(i).render();
-      if (laser.get(i).counterLaser > 80){
-          laser.remove(i);
-          i--;
+      if (laser.get(i).counterLaser > 80){ // if laser counter > 80 thhen remove laser
+          laser.remove(i); // remove laser at index (i)
+          i--; // deincrement i so that it is the same length as laser size
         }
     }
     if ((player1.score >= target) & !enemyExists) {
