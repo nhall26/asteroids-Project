@@ -5,9 +5,9 @@
  ------------------------------------------
  Authors: 
      Sam Williamson
-     Name
-     Name
-     Name
+     Nathan Hall
+     Neil Wilcox
+     Ben Hanssens
  ------------------------------------------
  Purpose: 
         "To work in your teams to develop 
@@ -92,7 +92,7 @@ void draw() {
       Function:
         Draw function
       Author:
-        Group effort, foundations laid by Sam.
+        Group effort, foundations laid by Sam, "next round" block added by Ben.
       Description:
         Draws everything in the program
         Perform the majority of the game while the player has lives as follows
@@ -101,12 +101,14 @@ void draw() {
           3 - Render the object
           4 - Check for collisions
           5 - Repeat for "x" amount of objects
+        Checks whether the player has destroyed all asteroids/aliens, or has lost all
+        lives, and displays the correct screen accordingly.
   */
   // Black background
   background(0);
   // Run the main program while the player still has lives
   if (player1.lives >= 0) {
-    // Gernate the header
+    // Generate the header
     header();
     // Update position
     player1.updatePos();  
@@ -161,9 +163,10 @@ void draw() {
           i--; // Deincrement i so that it is the same length as laser size
         }
     }
+    // If the player has reached the target score, and there is not currently an alien on the stage, then spawn one in
     if ((player1.score >= target) & !enemyExists) {
       enemy.add(new alien());
-      enemyExists = true;
+      enemyExists = true;  // Lets the program know that there is already an alien, so another will not spawn.
       target += 1000;   //Increment target by 1000 so that another enemy will spawn after another 1000 points.
     }
     
@@ -212,13 +215,14 @@ void draw() {
     if (nextRound == true) {
       background(0);
       if (nextRoundCount > 0) {
+        // Start a countdown before the next round starts, to allow the player time to get ready.
         textSize(50);
         textAlign(CENTER);
         text("Starting in " + (nextRoundCount-1), width/2, height/2);
         delay(1000);
         nextRoundCount--;
       } else {
-        roundOver = false;
+        // Set up variables for the next round.
         round += 1;
         asteroidCount += 2;  // Increase asteroid count so that the next round is harder.
         player1.position = new PVector(width/2, height/2);  // Reset player's position
@@ -229,11 +233,14 @@ void draw() {
         for (int i = 0; i < asteroidCount; i++) {
           asteroids.add(new asteroid(30, 0, 800, 0, 800, true));  // Spawn in new asteroids.
         }
+        
+        // Reset the variables associated with finishing a round.
         roundOver = false;
         nextRound = false;
         nextRoundCount = 4;
       }
     } else if (asteroids.size() == 0 && enemy.size() == 0) {
+      // Display the round-over screen once all the aliens and asteroids are destroyed.
       background(0);
       roundOver = true;
       textSize(50);
@@ -294,7 +301,7 @@ void header() {
       Function:
         Header function
       Author:
-        Predominantly Sam
+        Predominantly Sam, Score/Round display added by Ben.
       Description:
         Displays the top header which shows lives, score and title
   */
@@ -404,7 +411,7 @@ class Spaceship {
         return true; // Return true
       }
     }  
-    return false; // Return true
+    return false; // Return false
   }
   
   boolean collisionDetection2(ArrayList<alien> enemy) {
@@ -480,7 +487,7 @@ class bullet {
       Function:
         Bullet class
       Author:
-        Predominantly Sam, Collision detection added by 
+        Predominantly Sam, Collision detection added by ???, Scoring system added by Ben.
       Description:
         Creates a bullet object that is used to represent the player's
         projectiles. This class is very similar to the Spaceship class
@@ -528,9 +535,9 @@ class bullet {
       if (dist.mag() < a.radius) { // If bullet is inside the asteroid radius, then check for radius size
         a.breakUp(); // Call asteroid breakup function
         if (a.radius > 15) {  // If radius > 15, the asteroid will break into two smaller asteroids instead of being destroyed
-          player1.score += 50; // Add 50 to player score
-        } else {  // Otherwise, the asteroid is completely destroyed.
-          player1.score += 100; // Add 100 to player score
+          player1.score += 50; // Add 50 to player score for breaking up a larger asteroid
+        } else {  // Otherwise, the asteroid is completely destroyed
+          player1.score += 100; // Add 100 to player score for destroying a smaller asteroid
         }
         return true; // Return true
       }
@@ -543,7 +550,7 @@ class bullet {
       PVector dist = PVector.sub(a.position, position); // Check the distance between bullet and enemy
       if (dist.mag() < a.radius) { // If bullet is inside the enemy radius then call breakup and add score
         a.breakUp(); // Call breakup
-        player1.score += 200; // Add 200 to score
+        player1.score += 200; // Add 200 to player score for destroying the enemy
         return true; // Return true
       }
     }
@@ -572,7 +579,7 @@ class asteroid {
       Author:
         Foundations by Sam, expanded by  
       Description:
-        Creates an Asteroid object that generates and perforsm all of the
+        Creates an Asteroid object that generates and performs all of the
         functions that the asteroid takes in the game. Sam laid the
         foundation by first implementing the asteroids and developing the
         movement of each using sin and cos. A random number is generated
@@ -631,7 +638,7 @@ class asteroid {
     }
   }
   
-  /* break a larger asteroid that is larger than 15 pixels into 2 pieces smaller asteroids at the old asteroids position and halve the radius and 
+  /* Break a larger asteroid that is larger than 15 pixels into 2 pieces smaller asteroids at the old asteroids position and halve the radius and 
   /  remove the old asteroid, remove the old asteroid if it smaller equal to or smaller than 15 and spawn no new asteroids
   */
   void breakUp() {
@@ -718,11 +725,23 @@ class asteroid {
 
 // Begin the alien class
 class alien {
+  /* 
+      Function:
+        Alien class
+      Author:
+        Foundations by ??? 
+      Description:
+        Creates an Alien object that generates and performs all of the
+        functions that the enemy takes in the game. Uses similar functions
+        to the Asteroid class, but simplified as it does not need to account for
+        different sizes of aliens like the Asteroid class does.
+  */
+  
   PVector position, velocity; //PVectors for motion
   float heading, angle, radius; //Store variables
   int size = 30;
 
-  alien() {
+  alien() {  // The defauly alien object.
     heading = random(-180, 180);
     angle = heading;
     position = new PVector (random(0, 800), random(0, 800));
@@ -792,16 +811,27 @@ class alien {
 
 //Begin the Alaser Class
 class Alaser {
-  PVector position, velocity; //PVectors for motion
+  /* 
+      Function:
+        Alaser Class
+      Author:
+        Foundations by ???, Velocity modified by Ben.
+      Description:
+        Creates an "Alaser" object that is used to represent the enemy's
+        projectiles. The class has similar updatePos(), edgeDetection(), and
+        render() functions to the other classes, but lacks a "heading" variable,
+        as its trajectory is calculated differently.
+  */
+  
+  PVector position, velocity; // PVectors for motion
   int counterLaser;
 
-
-
+  //Initialise the Alaser object.
   Alaser() {
     position = new PVector(enemy.get(0).position.x,enemy.get(0).position.y);  // Makes initial start position the (x,y) of the alien
-    velocity = PVector.sub(player1.position, this.position);
-    velocity.normalize();
-    velocity.mult(5);
+    velocity = PVector.sub(player1.position, this.position);  // Subtracts the position PVectors of the player and the laser, resulting in a vector leading from one to the other.
+    velocity.normalize();  // Normalises the vector, keeping the direction while shortening the distance to 1.
+    velocity.mult(5);  // Increases the size of the velocity vector to 5, making the laser move faster.
     counterLaser = 0;
   }
 
