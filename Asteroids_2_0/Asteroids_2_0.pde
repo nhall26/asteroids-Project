@@ -508,7 +508,7 @@ class asteroid {
     velocity.mult(1.75);
     radius = r;
   }
-
+  
   void updatePos() {         //update the motion of the object
     position.add(velocity);    //add the current velocity to the position of the ship
     //acceleration.mult(0);    //reset the acceleration to 0 by multiplication
