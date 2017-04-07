@@ -496,11 +496,12 @@ class asteroid {
   PVector position, velocity, acceleration;  // standard vectors for movement
   float heading, angle, radius;
   
-  /*Take input of 3 floats, Radius of the asteroid = r, and use rand position to spawn asteroid. 
-  If default asteroid then anywhere on the map, else used for the split command spawn at the
-  'split' asteroid position*/
+  /* Take input of 5 floats, Radius of the asteroid = r, and use rand position to spawn asteroid between our b,c and d,e. 
+  /  If default asteroid then anywhere on the map, else used for the split command spawn at the
+  /  'split' asteroid position
+  */
   asteroid(float r, float b, float c, float d, float e) {
-    heading = random(-180, 180);
+    heading = random(-180, 180); // set the heading for our asteroid to move at.
     angle = heading; //- PI/2; // offset angle because ship is pointing vertical
     position = new PVector (random(b, c), random(d, e));
     velocity = new PVector (cos(angle), sin(angle));
@@ -527,7 +528,9 @@ class asteroid {
     }
   }
   
-  // break a larger asteroid into 2 pieces smaller asteroids and halve the radius and remove the old asteroid.
+  /* break a larger asteroid that is larger than 15 pixels into 2 pieces smaller asteroids at the old asteroids position and halve the radius and 
+  /  remove the old asteroid, remove the old asteroid if it smaller equal to or smaller than 15 and spawn no new asteroids
+  */
   void breakUp() {
     //if radius is larger than 15 then split otherwise just remove the asteroid.
     if (this.radius > 15){
@@ -538,7 +541,7 @@ class asteroid {
       asteroids.add(new asteroid(b, c, c, d, d)); //creation of new asteroid with b, c, and d
       asteroids.remove(this); // remove old asteroid
     } else
-    asteroids.remove(this); // remove asteroid if radius < 15
+    asteroids.remove(this); // remove asteroid if radius < 15 and spawn no new asteroids
   }
 
   void render() {
