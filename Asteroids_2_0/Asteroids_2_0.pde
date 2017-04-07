@@ -334,35 +334,35 @@ class Spaceship {
   }
 
   boolean collisionDetection(ArrayList<asteroid> asteroids) {
-    for (asteroid a : asteroids) {
-      PVector dist = PVector.sub(a.position, position);
-      if (dist.mag() < a.radius) {
+    for (asteroid a : asteroids) {//for each asteroid in asteroids go through
+      PVector dist = PVector.sub(a.position, position); //Check the distance between asteroid position and position of player
+      if (dist.mag() < a.radius) { // if dist is in the radius of the player return true and breakup said asteroid
         a.breakUp(); //call breakup on asteroid
-        return true;
+        return true; //return true
       }
     }  
-    return false;
+    return false; // return true
   }
   
   boolean collisionDetection2(ArrayList<alien> enemy) {
-    for (alien a : enemy) {
-      PVector dist = PVector.sub(a.position, position);
-      if (dist.mag() < a.radius) {
-        a.breakUp();
-        return true;
+    for (alien a : enemy) { // for each alien in enemy itterate through
+      PVector dist = PVector.sub(a.position, position); // Get the distance between alien and position of player
+      if (dist.mag() < a.radius) { // if dist between player and enemy is under the radius of the enemy then destroy alien and return true
+        a.breakUp(); // call breakup on a of enemy
+        return true; // return true
       }
     }
-    return false;
+    return false; //return true
   }
   
   boolean collisionDetection3(ArrayList<Alaser> laser) {
-    for (Alaser a : laser) {
-      PVector dist = PVector.sub(a.position, position);
+    for (Alaser a : laser) { // itterate through for each alien laser
+      PVector dist = PVector.sub(a.position, position); // if dist between player and enemy laser is under 2.5 then return true
       if (dist.mag() < 2.5) {
-        return true;
+        return true; //return true
       }
     }
-    return false;
+    return false; //return false
   }
 
   void render() {  // render the ship
