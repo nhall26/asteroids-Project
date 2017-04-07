@@ -275,14 +275,15 @@ void header() {
 
 // begin the Spaceship class
 class Spaceship {
+  //initialise valuees to be used by spaceship
   PVector position, velocity, acceleration;  //create PVectors for motion
   float damping = 0.995;  //damping value allows the gradual slow down effect
   float topspeed = 6;    //set the topspeed of the ship
   float heading = 0;    //set the heading (direction) of the ship
   int size = 10;      //set the size of the bounding box containing the ship
   boolean thrusting = false;  // keeps track of whether the ship is thrusting (for visual purposes)
-  int lives = 3;
-  boolean die = false;
+  int lives = 3; // Starting count of lives
+  boolean die = false; // boolean to check dead, set to false to begin.
   // stores the position in relation to the original coordinate matrix
   PVector newPosition;
   int score = 0;    //tracks the current score of the player
