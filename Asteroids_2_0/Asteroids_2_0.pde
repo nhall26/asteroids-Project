@@ -416,14 +416,13 @@ class bullet {
   PVector position, velocity, acceleration;  //create PVectors for motion
   float heading, angle;  // store the heading and angle
   int counter;  // store the distance counter
-  int timeout = 48;
   
   // default contructor
   bullet() {
     heading = player1.heading;  // set the ehading to be the same ass player1's heading
     angle = heading - PI/2; // offset angle because ship is pointing vertical
     // set the position to be the same as player1's original position
-    position = new PVector (player1.newPosition.x, player1.newPosition.y);
+    position = new PVector (player1.newPosition.x, player1.newPosition.y); // spawn at player x and y
     velocity = new PVector (cos(angle), sin(angle));  // assign values to the velocity vector
     velocity.mult(5); // multiple the values by 5
     counter = 0;  // set the counter to be 0
@@ -432,9 +431,6 @@ class bullet {
   void updatePos() {         //update the motion of the object
     position.add(velocity);    //add the current velocity to the position of the bullet
     counter++;  // increment the counter
-  }
-  void updateTime() {
-    time++;  // increment time
   }
 
   void edgeDetection() {  //detects if the bullets excceeds the frame edges.
@@ -453,35 +449,35 @@ class bullet {
   
   // collision detection for the bullets, same as ship collision
   boolean collisionDetection(ArrayList<asteroid> asteroids) {
-    for (asteroid a : asteroids) {
-      PVector dist = PVector.sub(a.position, position);
-      if (dist.mag() < a.radius) {
-        a.breakUp();
+    for (asteroid a : asteroids) {//for each asteroid in asteroids go through
+      PVector dist = PVector.sub(a.position, position); // check the distance between asteroid and bullet.
+      if (dist.mag() < a.radius) { // if bullet is inside the asteroid radius, then check for radius size
+        a.breakUp(); // call asteroid breakup function
         if (a.radius > 15) {  // If radius > 15, the asteroid will break into two smaller asteroids instead of being destroyed
-          player1.score += 50;
+          player1.score += 50; // add 50 to player score
         } else {  // Otherwise, the asteroid is completely destroyed.
-          player1.score += 100;
+          player1.score += 100; // add 100 to player score
         }
-        return true;
+        return true; // return true
       }
     }
-    return false;
+    return false; //return false
   }
   // collision detection for bullets on enemy
   boolean collisionDetection2(ArrayList<alien> enemy) {
-    for (alien a : enemy) {
-      PVector dist = PVector.sub(a.position, position);
-      if (dist.mag() < a.radius) {
-        a.breakUp();
-        player1.score += 200;
-        return true;
+    for (alien a : enemy) { // for each enemy itterate through
+      PVector dist = PVector.sub(a.position, position); // check the distance between bullet and enemy
+      if (dist.mag() < a.radius) { // if bullet is inside the enemy radius then call breakup and add score
+        a.breakUp(); // call breakup
+        player1.score += 200; // add 200 to score
+        return true; // return true
       }
     }
-    return false;
+    return false; // return false
   }
   // remove bullet from the array
   void removeBullet() {
-    bullets.remove(this);
+    bullets.remove(this); // removes this bullet from the array
   }
   // render the bulelts
   void render() {
