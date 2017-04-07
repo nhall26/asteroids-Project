@@ -49,7 +49,7 @@ void setup() {
   time = millis();
   
   for (int i = 0; i < asteroidCount; i++) {
-    asteroids.add(new asteroid(30, 0, 800));
+    asteroids.add(new asteroid(30, 0, 800, 0, 800));
   }
 }
 
@@ -186,7 +186,7 @@ void draw() {
         bullets = new ArrayList<bullet>();  // Remove bullets currently on screen
         laser = new ArrayList<Alaser>();  // Remove lasers currently on screen
         for (int i = 0; i < asteroidCount; i++) {
-          asteroids.add(new asteroid(30, 0, 800));  // Spawn in new asteroids.
+          asteroids.add(new asteroid(30, 0, 800, 0, 800));  // Spawn in new asteroids.
         }
         roundOver = false;
         nextRound = false;
@@ -220,7 +220,7 @@ void draw() {
       laser = new ArrayList<Alaser>();
       asteroidCount = 5;
       for (int i = 0; i < asteroidCount; i++) {
-        asteroids.add(new asteroid(30, 0, 800));
+        asteroids.add(new asteroid(30, 0, 800, 0, 800));
       }
       time = millis();
       enemyExists = false;      
@@ -502,10 +502,10 @@ class asteroid {
   /*Take input of 3 floats, Radius of the asteroid = r, and use rand position to spawn asteroid. 
   If default asteroid then anywhere on the map, else used for the split command spawn at the
   'split' asteroid position*/
-  asteroid(float r, float b, float c) {
+  asteroid(float r, float b, float c, float d, float e) {
     heading = random(-180, 180);
     angle = heading; //- PI/2; // offset angle because ship is pointing vertical
-    position = new PVector (random(b, c), random(b, c));
+    position = new PVector (random(b, c), random(d, e));
     velocity = new PVector (cos(angle), sin(angle));
     velocity.mult(1.75);
     radius = r;
@@ -537,8 +537,8 @@ class asteroid {
       float b = this.radius / 2; // Take the radius and divide by 2 for creation of new asteroid.
       float c = this.position.x; // take the x position for use in the creation of new asteroids
       float d = this.position.y; // take the y position for use in the creation of new asteroids
-      asteroids.add(new asteroid(b, c, d)); //creation of new asteroid with b, c, and d
-      asteroids.add(new asteroid(b, c, d)); //creation of new asteroid with b, c, and d
+      asteroids.add(new asteroid(b, c, c, d, d)); //creation of new asteroid with b, c, and d
+      asteroids.add(new asteroid(b, c, c, d, d)); //creation of new asteroid with b, c, and d
       asteroids.remove(this); // remove old asteroid
     } else
     asteroids.remove(this); // remove asteroid if radius < 15
