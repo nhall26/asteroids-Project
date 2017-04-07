@@ -154,17 +154,17 @@ void draw() {
       bullets.get(i).updatePos();
       bullets.get(i).edgeDetection();
       bullets.get(i).render();
-      // check if the bullets collide with anything or have travelled a certain distance
-      if (bullets.get(i).collisionDetection(asteroids)) {
-        bullets.remove(i);
-        i--;
-      } else if (bullets.get(i).collisionDetection2(enemy)) {
-        bullets.remove(i);
-        i--;
+      // check if the bullets collide with anything or have travelled for a certain time
+      if (bullets.get(i).collisionDetection(asteroids)) { // if any bullets i collides with any asteroids then remove bullets and i--
+        bullets.remove(i); // remove bullet at index i
+        i--; // deincrement i so that it is the same size as bullets array length
+      } else if (bullets.get(i).collisionDetection2(enemy)) { // if any bullets i collides with any enemy then remove bullets and i--
+        bullets.remove(i); // remove bullet at index i
+        i--; //deincrement i so that it is the same size as bullets array length
         enemyExists = false;
-      } else if (bullets.get(i).counter > 80){
-        bullets.remove(i);
-        i--;
+      } else if (bullets.get(i).counter > 80){ // otherwise if bullets counter of bullets(i) is greater than 80 then remove bullet
+        bullets.remove(i); // remove bullet at index i
+        i--; // deincrement i so that it is the same size as bullets array length
       }
     }
     
