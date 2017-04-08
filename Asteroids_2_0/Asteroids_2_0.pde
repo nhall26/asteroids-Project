@@ -739,7 +739,7 @@ class alien {
       Function:
         Alien class
       Author:
-        Foundations by ??? 
+        Foundations by Neil
       Description:
         Creates an Alien object that generates and performs all of the
         functions that the enemy takes in the game. Uses similar functions
@@ -825,7 +825,7 @@ class Alaser {
       Function:
         Alaser Class
       Author:
-        Foundations by ???, Velocity modified by Ben.
+        Foundations by Neil, Velocity modified by Ben.
       Description:
         Creates an "Alaser" object that is used to represent the enemy's
         projectiles. The class has similar updatePos(), edgeDetection(), and
@@ -836,7 +836,7 @@ class Alaser {
   PVector position, velocity; // PVectors for motion
   int counterLaser;
 
-  //Initialise the Alaser object.
+  // Initialise the Alaser object.
   Alaser() {
     position = new PVector(enemy.get(0).position.x,enemy.get(0).position.y);  // Makes initial start position the (x,y) of the alien
     velocity = PVector.sub(player1.position, this.position);  // Subtracts the position PVectors of the player and the laser, resulting in a vector leading from one to the other.
@@ -845,7 +845,7 @@ class Alaser {
     counterLaser = 0;
   }
 
-  //Function to add the velocity to the position
+  // Function to add the velocity to the position
   void updatePos() {
     position.add(velocity);
     counterLaser++;
