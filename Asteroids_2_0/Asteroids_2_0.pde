@@ -231,7 +231,7 @@ void draw() {
         bullets = new ArrayList<bullet>();  // Remove bullets currently on screen
         laser = new ArrayList<Alaser>();  // Remove lasers currently on screen
         for (int i = 0; i < asteroidCount; i++) {
-          asteroids.add(new asteroid(30, 0, 800, 0, 800, true));  // Spawn in new asteroids.
+          asteroids.add(new asteroid(30, 0, 800, 0, 800, false));  // Spawn in new asteroids.
         }
         
         // Reset the variables associated with finishing a round.
@@ -601,13 +601,23 @@ class asteroid {
     angle = heading; //- PI/2; // Offset angle because ship is pointing vertical
     position = new PVector (random(b, c), random(d, e));
     while (position.x > (player1.position.x - 50) && position.x < (player1.position.x + 50)) {
-      b += 10;
-      c += 10;
+      if (position.x > (player1.position.x - 50)) {
+        b -= 10;
+        c -= 10;
+      } else if (position.x < (player1.position.x + 50)) {
+        b += 10;
+        c += 10;
+      }
       position.x = random(b,c);
     }
     while (position.y > (player1.position.y - 50) && position.y < (player1.position.y + 50)) {
-      d += 10;
-      e += 10;
+      if (position.y > (player1.position.y - 50)) {
+        d -= 10;
+        e -= 10;
+      } else if (position.y < (player1.position.y + 50)) {
+        d += 10;
+        e += 10;
+      }
       position.y = random(d,e);
     }
     velocity = new PVector (cos(angle), sin(angle));
