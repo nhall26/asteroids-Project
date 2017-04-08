@@ -335,7 +335,7 @@ class Spaceship {
       Function:
         Spaceship class
       Author:
-        Predominantly Sam, collision detection added by 
+        Predominantly Sam, collision detection added by Nathan
       Description:
         Creates a Spaceship object that is used to represent the player
         Used an object oriented approach due to previous familiarity with
@@ -487,7 +487,7 @@ class bullet {
       Function:
         Bullet class
       Author:
-        Predominantly Sam, Collision detection added by ???, Scoring system added by Ben.
+        Predominantly Sam, Collision detection added by Nathan, Scoring system added by Ben.
       Description:
         Creates a bullet object that is used to represent the player's
         projectiles. This class is very similar to the Spaceship class
@@ -577,7 +577,7 @@ class asteroid {
       Function:
         Asteroid class
       Author:
-        Foundations by Sam, expanded by  
+        Foundations by Sam, expanded by Nathan
       Description:
         Creates an Asteroid object that generates and performs all of the
         functions that the asteroid takes in the game. Sam laid the
