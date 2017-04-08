@@ -169,7 +169,7 @@ void draw() {
       enemyExists = true;  // Lets the program know that there is already an alien, so another will not spawn.
       target += 1000;   //Increment target by 1000 so that another enemy will spawn after another 1000 points.
     }
-    
+    // If there is an enemy on the stage, and it has been long enough since the last laser was fired, spawn in a new laser
     if (enemyExists == true) {
       if (millis() - time >= wait) {
         laser.add(new Alaser());
