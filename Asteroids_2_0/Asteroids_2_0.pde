@@ -275,6 +275,7 @@ void draw() {
       enemyExists = false;      
       tryAgainCount = 3;
       tryAgain = false;
+      target = 1000;
       round = 1;
     }
   } else {
